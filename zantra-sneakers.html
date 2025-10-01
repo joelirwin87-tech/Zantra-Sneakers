@@ -253,6 +253,7 @@
         const cadenceMs = 30000;
         let hydrationWarningMessage = null;
 
+
         const elements = {
           form: document.getElementById('watch-form'),
           url: document.getElementById('sneaker-url'),
@@ -276,6 +277,7 @@
           alerts: 0,
           timer: null,
           isRefreshing: false
+
         };
 
         const formatCurrency = (value) => {
@@ -300,6 +302,7 @@
           const formatted = formatCurrency(value);
           return formatted.replace(/<[^>]*>/g, '');
         };
+
 
         const parseUrlToName = (urlString) => {
           try {
@@ -898,11 +901,13 @@
           }
         };
 
+
         const simulateSizeAvailability = () => {
           const baseSizes = ['US 6', 'US 7', 'US 8', 'US 9', 'US 10', 'US 11', 'US 12', 'US 13'];
           const available = baseSizes.filter(() => Math.random() > 0.45);
           return available.length ? available : ['US 9', 'US 10'];
         };
+
 
         const toIsoString = (date) => {
           return date.toLocaleString([], {
@@ -990,6 +995,7 @@
           logEvent(`${product.title}: ${changes.join('; ')}.`, level);
         };
 
+
         const persist = () => {
           try {
             saveProducts({
@@ -1018,6 +1024,7 @@
             if (!product) {
               return;
             }
+
             const row = elements.rowTemplate.content.firstElementChild.cloneNode(true);
             const nameEl = row.querySelector('[data-field="name"]');
             const urlEl = row.querySelector('[data-field="url"]');
@@ -1046,6 +1053,7 @@
                 : level === 'success'
                 ? 'bg-emerald-500/20 text-emerald-200'
                 : level === 'warning'
+
                 ? 'bg-amber-400/20 text-amber-100'
                 : 'bg-slate-800 text-slate-200'
             }`;
@@ -1055,6 +1063,7 @@
                 const reason = error && error.message ? error.message : 'Manual check failed';
                 logEvent(`${product.title}: ${reason}.`, 'error');
               });
+
             });
 
             row.querySelector('[data-action="remove"]').addEventListener('click', () => {
@@ -1066,6 +1075,7 @@
             });
 
             if (monitor.targetPrice !== null && priceSource !== null && priceSource !== undefined && Number(priceSource) <= Number(monitor.targetPrice)) {
+
               row.classList.add('bg-emerald-500/10');
             }
 
@@ -1116,6 +1126,7 @@
           };
         };
 
+
         const createProductFromUrl = (parsedUrl) => {
           const slugSegments = parsedUrl.pathname.split('/').filter(Boolean);
           const slug = slugSegments[slugSegments.length - 1] || parsedUrl.hostname;
@@ -1133,6 +1144,7 @@
             url: parsedUrl.href,
             lastUpdated: nowIso
           });
+
         };
 
         const addSneaker = (url, targetPrice) => {
@@ -1152,6 +1164,7 @@
           const productId = generateId(parsedUrl.href);
           const existingMonitor = state.monitors.find((monitor) => monitor.productId === productId);
           if (existingMonitor) {
+
             logEvent('This sneaker is already being tracked.', 'warning');
             return;
           }
@@ -1216,6 +1229,7 @@
           const safeBase = Number.isFinite(base) && base > 0 ? base : 200;
           const variance = Math.random() * 120 - 60;
           const raw = Math.max(60, safeBase + variance);
+
           return Number(raw.toFixed(2));
         };
 
@@ -1242,6 +1256,7 @@
           let successRecorded = false;
           let diffResult = null;
 
+
           monitor.status = 'Checking…';
           monitor.statusLevel = 'neutral';
           render();
@@ -1258,6 +1273,7 @@
 
               if (Array.isArray(liveProduct.sizes) && liveProduct.sizes.length) {
                 product.sizes = uniqueSizes(liveProduct.sizes);
+
               }
 
               if (liveProduct.price !== null && liveProduct.price !== undefined) {
@@ -1273,6 +1289,7 @@
               ...product,
               sizes: Array.isArray(product.sizes) ? [...product.sizes] : []
             });
+
 
             let statusLevel = 'neutral';
             let statusMessage = 'No change';
@@ -1334,6 +1351,7 @@
               sizes: Array.isArray(product.sizes) ? [...product.sizes] : []
             });
 
+
             if ((fallbackStatus.level === 'success' || fallbackStatus.level === 'alert') && !successRecorded) {
               state.successChecks += 1;
               successRecorded = true;
@@ -1357,6 +1375,7 @@
             if (!firstCheck && diffResult) {
               logChange(diffResult, product);
             }
+
             persist();
             render();
             const lastChecked = monitor.lastChecked ? new Date(monitor.lastChecked) : new Date();
@@ -1388,6 +1407,7 @@
               logEvent(`Auto refresh issue: ${reason}.`, 'warning');
             });
           }, cadenceMs);
+
           elements.cadence.textContent = `${Math.round(cadenceMs / 1000)}s`;
         };
 
@@ -1403,6 +1423,7 @@
             persist();
           }
         };
+
 
         elements.form.addEventListener('submit', (event) => {
           event.preventDefault();
@@ -1426,6 +1447,7 @@
           } catch (error) {
             // ignore removal issues
           }
+
           persist();
           render();
           elements.log.innerHTML = '';
@@ -1435,6 +1457,7 @@
         document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible') {
             runAllChecks().catch(() => {});
+
           }
         });
 
@@ -1451,6 +1474,7 @@
         } else {
           logEvent('Monitor restored from previous session.', 'info');
           runAllChecks().catch(() => {});
+
         }
       })();
     </script>
