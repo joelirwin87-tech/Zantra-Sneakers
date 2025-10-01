@@ -253,6 +253,7 @@
         const cadenceMs = 30000;
         let hydrationWarningMessage = null;
 
+
         const elements = {
           form: document.getElementById('watch-form'),
           url: document.getElementById('sneaker-url'),
@@ -272,6 +273,7 @@
         const state = {
           products: [],
           monitors: [],
+
           successChecks: 0,
           alerts: 0,
           timer: null
@@ -434,6 +436,7 @@
           return available.length ? available : ['US 9', 'US 10'];
         };
 
+
         const toIsoString = (date) => {
           return date.toLocaleString([], {
             hour: '2-digit',
@@ -496,6 +499,7 @@
             if (!product) {
               return;
             }
+
             const row = elements.rowTemplate.content.firstElementChild.cloneNode(true);
             const nameEl = row.querySelector('[data-field="name"]');
             const urlEl = row.querySelector('[data-field="url"]');
@@ -524,6 +528,7 @@
                 : level === 'success'
                 ? 'bg-emerald-500/20 text-emerald-200'
                 : level === 'warning'
+
                 ? 'bg-amber-400/20 text-amber-100'
                 : 'bg-slate-800 text-slate-200'
             }`;
@@ -541,6 +546,7 @@
             });
 
             if (monitor.targetPrice !== null && priceSource !== null && priceSource !== undefined && Number(priceSource) <= Number(monitor.targetPrice)) {
+
               row.classList.add('bg-emerald-500/10');
             }
 
@@ -578,6 +584,7 @@
             url: parsedUrl.href,
             lastUpdated: nowIso
           });
+
         };
 
         const addSneaker = (url, targetPrice) => {
@@ -597,6 +604,7 @@
           const productId = generateId(parsedUrl.href);
           const existingMonitor = state.monitors.find((monitor) => monitor.productId === productId);
           if (existingMonitor) {
+
             logEvent('This sneaker is already being tracked.', 'warning');
             return;
           }
@@ -661,6 +669,7 @@
           const safeBase = Number.isFinite(base) && base > 0 ? base : 200;
           const variance = Math.random() * 120 - 60;
           const raw = Math.max(60, safeBase + variance);
+
           return Number(raw.toFixed(2));
         };
 
@@ -690,6 +699,7 @@
           product.lastUpdated = now.toISOString();
           product.sizes = simulateSizeAvailability();
 
+
           if (level === 'success' || level === 'alert') {
             state.successChecks += 1;
           }
@@ -703,6 +713,7 @@
           } else {
             const formatted = formatCurrency(price).replace(/<[^>]*>/g, '');
             logEvent(`${product.title}: ${status.toLowerCase()} (est. ${formatted}).`, level === 'alert' ? 'warning' : 'info');
+
           }
 
           persist();
@@ -718,6 +729,7 @@
         const runAllChecks = () => {
           if (!state.monitors.length) return;
           state.monitors.forEach((monitor) => runCheck(monitor.productId, false));
+
         };
 
         const startAutoRefresh = () => {
@@ -738,6 +750,7 @@
             persist();
           }
         };
+
 
         elements.form.addEventListener('submit', (event) => {
           event.preventDefault();
@@ -761,6 +774,7 @@
           } catch (error) {
             // ignore removal issues
           }
+
           persist();
           render();
           elements.log.innerHTML = '';
@@ -782,6 +796,7 @@
         }
 
         if (!state.monitors.length) {
+
           logEvent('Welcome! Add a sneaker URL to begin monitoring.', 'info');
         } else {
           logEvent('Monitor restored from previous session.', 'info');
