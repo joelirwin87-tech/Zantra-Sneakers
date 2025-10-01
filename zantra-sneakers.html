@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zantra Sneakers Monitor</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-ol8nvxr2idK4USsfx8bVsgcuyo6edSxnl2xe50Tzw9uQWGWpZJYG1ChcxrFAuo0xO+ogzAm8h1Hn0fln+rZ9Yg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <style>
+      ::selection {
+        background-color: #22d3ee;
+        color: #0f172a;
+      }
+      [data-badge]::after {
+        content: attr(data-badge);
+        position: absolute;
+        top: -0.5rem;
+        right: -0.5rem;
+        background: #f97316;
+        color: #0f172a;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1;
+        border-radius: 9999px;
+        padding: 0.25rem 0.5rem;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header class="relative isolate overflow-hidden bg-gradient-to-br from-cyan-400/20 via-slate-900 to-slate-950">
+      <div class="absolute inset-0 opacity-40" aria-hidden="true">
+        <div class="absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-cyan-500/20 blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-emerald-500/20 blur-3xl"></div>
+      </div>
+      <div class="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-16 lg:flex-row lg:items-center lg:justify-between">
+        <div class="max-w-3xl space-y-4">
+          <p class="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-1 text-sm font-semibold text-cyan-200">
+            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+            Real-time drop tracking
+          </p>
+          <h1 class="text-4xl font-black tracking-tight text-white sm:text-5xl">
+            Zantra Sneakers Monitor
+          </h1>
+          <p class="text-lg text-slate-200">
+            Centralize every sneaker drop, restock alert, and price movement in one responsive command center. Track, prioritize, and react faster than the hype.
+          </p>
+        </div>
+        <div class="relative mt-6 flex items-center justify-center lg:mt-0">
+          <div class="relative flex h-32 w-32 items-center justify-center rounded-full border border-cyan-300/50 bg-slate-900/70 shadow-lg shadow-cyan-500/20">
+            <svg class="h-20 w-20 text-cyan-300" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M4 15c.2 2.3 1.7 4 4 4h6.5c3 0 4.5-1.4 4.5-4.5 0-2.3-1.6-4.5-4.5-4.5h-1c-.2 0-.4-.1-.5-.3l-.4-1.1c-.2-.6-.5-.9-1.1-.9H8c-1.5 0-2.3.9-2 2.5l.5 2.4"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+              <path
+                d="M9.5 6.5c0 1 .7 1.7 1.5 1.7S12.5 7.5 12.5 6.5 11.8 5 11 5s-1.5.7-1.5 1.5Z"
+                fill="currentColor"
+              ></path>
+              <path
+                d="M5 19h12"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10">
+      <section aria-labelledby="monitor-form" class="rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-cyan-500/10">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div class="space-y-2">
+            <h2 id="monitor-form" class="text-2xl font-semibold text-white">Add sneaker to watch</h2>
+            <p class="text-sm text-slate-300">
+              Drop a product page URL and optional target price. We will keep eyes on it and surface notable changes instantly.
+            </p>
+          </div>
+          <form id="watch-form" class="flex w-full flex-col gap-4 rounded-2xl bg-slate-950/80 p-4 sm:flex-row sm:items-end">
+            <label class="flex-1 text-sm font-medium text-slate-200">
+              <span class="mb-2 block text-xs uppercase tracking-wide text-slate-400">Sneaker URL</span>
+              <input
+                id="sneaker-url"
+                name="sneaker-url"
+                type="url"
+                required
+                autocomplete="off"
+                placeholder="https://www.zantra.com/sneakers/sb-dunk"
+                class="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-base text-slate-100 placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+              />
+            </label>
+            <label class="w-full text-sm font-medium text-slate-200 sm:w-44">
+              <span class="mb-2 block text-xs uppercase tracking-wide text-slate-400">Target price (USD)</span>
+              <input
+                id="target-price"
+                name="target-price"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="250"
+                class="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-base text-slate-100 placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+              />
+            </label>
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-cyan-400/40 transition hover:translate-y-0.5 hover:bg-cyan-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 focus-visible:ring-cyan-200"
+            >
+              <span class="fa-solid fa-plus"></span>
+              Add to monitor
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section aria-labelledby="monitor-table" class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 id="monitor-table" class="text-2xl font-semibold text-white">Active watchlist</h2>
+          <span id="watch-count" class="text-sm text-slate-400">0 sneakers tracked</span>
+        </div>
+        <div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-cyan-500/10">
+          <div class="relative overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-800" aria-describedby="monitor-table">
+              <thead class="bg-slate-900/90 text-left text-xs uppercase tracking-wider text-slate-400">
+                <tr>
+                  <th scope="col" class="px-6 py-3">Sneaker</th>
+                  <th scope="col" class="px-6 py-3">Target price</th>
+                  <th scope="col" class="px-6 py-3">Last seen price</th>
+                  <th scope="col" class="px-6 py-3">Status</th>
+                  <th scope="col" class="px-6 py-3">Last checked</th>
+                  <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="sneakers-body" class="divide-y divide-slate-800 text-sm"></tbody>
+            </table>
+          </div>
+          <div id="empty-state" class="flex flex-col items-center gap-3 px-6 py-12 text-center text-slate-400">
+            <span class="rounded-full bg-slate-800/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide">Nothing monitored yet</span>
+            <p class="max-w-md text-sm">
+              Add your first sneaker URL to kickstart live tracking. We will simulate activity so you can test your workflow instantly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="live-feed" class="grid gap-6 lg:grid-cols-5">
+        <div class="lg:col-span-3">
+          <h2 id="live-feed" class="text-2xl font-semibold text-white">Live feed</h2>
+          <div class="mt-4 h-96 overflow-y-auto rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-cyan-500/10">
+            <ol id="activity-log" class="space-y-4 text-sm" aria-live="polite"></ol>
+          </div>
+        </div>
+        <aside class="lg:col-span-2">
+          <div class="relative rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-cyan-500/10">
+            <div class="absolute right-6 top-6" data-badge="LIVE" aria-hidden="true"></div>
+            <h3 class="text-xl font-semibold text-white">Monitor health</h3>
+            <dl class="mt-6 space-y-4 text-sm text-slate-300">
+              <div class="flex items-center justify-between">
+                <dt>Auto-refresh cadence</dt>
+                <dd><span id="cadence">30s</span></dd>
+              </div>
+              <div class="flex items-center justify-between">
+                <dt>Last heartbeat</dt>
+                <dd id="heartbeat">—</dd>
+              </div>
+              <div class="flex items-center justify-between">
+                <dt>Successful checks</dt>
+                <dd id="success-count">0</dd>
+              </div>
+              <div class="flex items-center justify-between">
+                <dt>Alerts dispatched</dt>
+                <dd id="alert-count">0</dd>
+              </div>
+            </dl>
+            <button
+              id="purge-storage"
+              type="button"
+              class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-rose-400/40 bg-rose-500/20 px-4 py-3 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/60"
+            >
+              <span class="fa-solid fa-trash"></span>
+              Clear stored data
+            </button>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-800 bg-slate-950/80">
+      <div class="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+        <p class="flex items-center gap-2">
+          <span class="fa-solid fa-bolt text-cyan-300"></span>
+          Built for rapid-fire sneaker intel.
+        </p>
+        <nav aria-label="Footer" class="flex flex-wrap items-center gap-4 text-xs uppercase tracking-wide">
+          <a href="#monitor-form" class="text-slate-300 transition hover:text-white">Add watch</a>
+          <a href="#monitor-table" class="text-slate-300 transition hover:text-white">Watchlist</a>
+          <a href="#live-feed" class="text-slate-300 transition hover:text-white">Live feed</a>
+        </nav>
+      </div>
+    </footer>
+
+    <template id="sneaker-row-template">
+      <tr class="transition hover:bg-slate-900/80">
+        <td class="whitespace-nowrap px-6 py-4">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-200">
+              <span class="fa-solid fa-shoe-prints"></span>
+            </span>
+            <div>
+              <p class="font-medium text-white" data-field="name"></p>
+              <a data-field="url" class="text-xs text-cyan-300 underline-offset-4 hover:underline" target="_blank" rel="noopener"></a>
+            </div>
+          </div>
+        </td>
+        <td class="whitespace-nowrap px-6 py-4" data-field="target"></td>
+        <td class="whitespace-nowrap px-6 py-4" data-field="last-price"></td>
+        <td class="whitespace-nowrap px-6 py-4">
+          <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold" data-field="status"></span>
+        </td>
+        <td class="whitespace-nowrap px-6 py-4" data-field="checked"></td>
+        <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+          <div class="flex flex-wrap justify-end gap-2">
+            <button type="button" data-action="check" class="inline-flex items-center gap-2 rounded-lg bg-emerald-500/20 px-3 py-2 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40">
+              <span class="fa-solid fa-rotate"></span>
+              Check now
+            </button>
+            <button type="button" data-action="rename" class="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40">
+              <span class="fa-solid fa-pen"></span>
+              Rename
+            </button>
+            <button type="button" data-action="remove" class="inline-flex items-center gap-2 rounded-lg bg-rose-500/20 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/60">
+              <span class="fa-solid fa-xmark"></span>
+              Remove
+            </button>
+          </div>
+        </td>
+      </tr>
+    </template>
+
+    <script>
+      (() => {
+        const storageKey = 'zantraSneakerMonitor/v2';
+        const cadenceMs = 30000;
+        let hydrationWarningMessage = null;
+
+        const elements = {
+          form: document.getElementById('watch-form'),
+          url: document.getElementById('sneaker-url'),
+          price: document.getElementById('target-price'),
+          tableBody: document.getElementById('sneakers-body'),
+          emptyState: document.getElementById('empty-state'),
+          log: document.getElementById('activity-log'),
+          cadence: document.getElementById('cadence'),
+          heartbeat: document.getElementById('heartbeat'),
+          successCount: document.getElementById('success-count'),
+          alertCount: document.getElementById('alert-count'),
+          watchCount: document.getElementById('watch-count'),
+          purgeButton: document.getElementById('purge-storage'),
+          rowTemplate: document.getElementById('sneaker-row-template')
+        };
+
+        const state = {
+          products: [],
+          monitors: [],
+          successChecks: 0,
+          alerts: 0,
+          timer: null
+        };
+
+        const formatCurrency = (value) => {
+          if (value === null || value === undefined || value === '') {
+            return '<span class="text-slate-500">—</span>';
+          }
+          const numeric = Number(value);
+          if (Number.isNaN(numeric)) {
+            return '<span class="text-slate-500">—</span>';
+          }
+          return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 2
+          }).format(numeric);
+        };
+
+        const parseUrlToName = (urlString) => {
+          try {
+            const parsed = new URL(urlString);
+            const segments = parsed.pathname.split('/').filter(Boolean);
+            if (!segments.length) return parsed.hostname;
+            return segments[segments.length - 1]
+              .replace(/[-_]+/g, ' ')
+              .replace(/\s+/g, ' ')
+              .replace(/\b\w/g, (c) => c.toUpperCase());
+          } catch (error) {
+            return 'Untitled Sneaker';
+          }
+        };
+
+        const generateId = (url) => {
+          const normalized = (url || '').trim().toLowerCase();
+          if (!normalized) {
+            return `prd_${Math.random().toString(36).slice(2, 10)}`;
+          }
+          let hash = 0;
+          for (let index = 0; index < normalized.length; index += 1) {
+            hash = (hash << 5) - hash + normalized.charCodeAt(index);
+            hash |= 0;
+          }
+          return `prd_${Math.abs(hash).toString(36)}`;
+        };
+
+        const defaultSnapshot = () => ({
+          products: [],
+          monitors: [],
+          successChecks: 0,
+          alerts: 0
+        });
+
+        const canonicalizeProduct = (candidate) => {
+          if (!candidate || typeof candidate !== 'object') return null;
+          const url = typeof candidate.url === 'string' ? candidate.url.trim() : '';
+          const id = typeof candidate.id === 'string' && candidate.id ? candidate.id : generateId(url || candidate.title || Date.now().toString());
+          let site = typeof candidate.site === 'string' ? candidate.site.trim() : '';
+          if (!site && url) {
+            try {
+              site = new URL(url).hostname;
+            } catch (error) {
+              site = '';
+            }
+          }
+          const title = typeof candidate.title === 'string' && candidate.title.trim() ? candidate.title.trim() : 'Untitled Sneaker';
+          const sku = typeof candidate.sku === 'string' ? candidate.sku.trim().slice(0, 32).toUpperCase() : '';
+          const priceValue = Number(candidate.price);
+          const price = Number.isFinite(priceValue) ? Number(priceValue.toFixed(2)) : null;
+          const sizes = Array.isArray(candidate.sizes)
+            ? candidate.sizes
+                .map((size) => String(size).trim())
+                .filter(Boolean)
+            : [];
+          const image = typeof candidate.image === 'string' ? candidate.image.trim() : '';
+          const lastUpdated =
+            candidate.lastUpdated && !Number.isNaN(Date.parse(candidate.lastUpdated))
+              ? new Date(candidate.lastUpdated).toISOString()
+              : new Date().toISOString();
+
+          return {
+            id,
+            site,
+            title,
+            sku,
+            price,
+            sizes,
+            image,
+            url,
+            lastUpdated
+          };
+        };
+
+        const canonicalizeMonitor = (candidate) => {
+          if (!candidate || typeof candidate !== 'object') return null;
+          const allowedLevels = new Set(['alert', 'success', 'warning', 'neutral']);
+          const priceValue = Number(candidate.targetPrice);
+          const lastSeenValue = Number(candidate.lastSeenPrice);
+          const lastChecked =
+            candidate.lastChecked && !Number.isNaN(Date.parse(candidate.lastChecked))
+              ? new Date(candidate.lastChecked).toISOString()
+              : null;
+
+          return {
+            productId: typeof candidate.productId === 'string' ? candidate.productId : '',
+            targetPrice: Number.isFinite(priceValue) && priceValue >= 0 ? Number(priceValue.toFixed(2)) : null,
+            lastSeenPrice: Number.isFinite(lastSeenValue) ? Number(lastSeenValue.toFixed(2)) : null,
+            lastChecked,
+            status: typeof candidate.status === 'string' ? candidate.status : 'Idle',
+            statusLevel: allowedLevels.has(candidate.statusLevel) ? candidate.statusLevel : 'neutral'
+          };
+        };
+
+        const loadProducts = () => {
+          try {
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) {
+              return defaultSnapshot();
+            }
+            const parsed = JSON.parse(raw);
+            const snapshot = defaultSnapshot();
+            if (Array.isArray(parsed.products)) {
+              snapshot.products = parsed.products.map(canonicalizeProduct).filter(Boolean);
+            }
+            if (Array.isArray(parsed.monitors)) {
+              snapshot.monitors = parsed.monitors.map(canonicalizeMonitor).filter((monitor) => monitor && monitor.productId);
+            }
+            if (Number.isFinite(parsed.successChecks)) {
+              snapshot.successChecks = parsed.successChecks;
+            }
+            if (Number.isFinite(parsed.alerts)) {
+              snapshot.alerts = parsed.alerts;
+            }
+            return snapshot;
+          } catch (error) {
+            hydrationWarningMessage = 'Stored data was corrupted and has been reset.';
+            localStorage.removeItem(storageKey);
+            return defaultSnapshot();
+          }
+        };
+
+        const saveProducts = (snapshot) => {
+          const sanitized = {
+            products: Array.isArray(snapshot.products)
+              ? snapshot.products.map(canonicalizeProduct).filter(Boolean)
+              : [],
+            monitors: Array.isArray(snapshot.monitors)
+              ? snapshot.monitors.map(canonicalizeMonitor).filter((monitor) => monitor && monitor.productId)
+              : [],
+            successChecks: Number.isFinite(snapshot.successChecks) ? snapshot.successChecks : 0,
+            alerts: Number.isFinite(snapshot.alerts) ? snapshot.alerts : 0
+          };
+          localStorage.setItem(storageKey, JSON.stringify(sanitized));
+        };
+
+        const simulateSizeAvailability = () => {
+          const baseSizes = ['US 6', 'US 7', 'US 8', 'US 9', 'US 10', 'US 11', 'US 12', 'US 13'];
+          const available = baseSizes.filter(() => Math.random() > 0.45);
+          return available.length ? available : ['US 9', 'US 10'];
+        };
+
+        const toIsoString = (date) => {
+          return date.toLocaleString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            month: 'short',
+            day: 'numeric'
+          });
+        };
+
+        const logEvent = (message, level = 'info') => {
+          const entry = document.createElement('li');
+          entry.className = 'rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 shadow-inner shadow-black/30';
+          const time = document.createElement('p');
+          time.className = 'text-xs uppercase tracking-wide text-slate-500';
+          time.textContent = new Date().toLocaleTimeString();
+          const content = document.createElement('p');
+          content.className = 'mt-1 text-sm';
+          const palette = {
+            info: 'text-slate-200',
+            success: 'text-emerald-200',
+            warning: 'text-amber-200',
+            error: 'text-rose-200'
+          };
+          content.classList.add(palette[level] || palette.info);
+          content.textContent = message;
+          entry.append(time, content);
+          elements.log.prepend(entry);
+          const limit = 30;
+          while (elements.log.childElementCount > limit) {
+            elements.log.removeChild(elements.log.lastElementChild);
+          }
+        };
+
+        const persist = () => {
+          try {
+            saveProducts({
+              products: state.products,
+              monitors: state.monitors,
+              successChecks: state.successChecks,
+              alerts: state.alerts
+            });
+          } catch (error) {
+            logEvent('Unable to persist watchlist to local storage.', 'error');
+          }
+        };
+
+        const render = () => {
+          elements.tableBody.innerHTML = '';
+          elements.watchCount.textContent = `${state.monitors.length} sneaker${state.monitors.length === 1 ? '' : 's'} tracked`;
+          elements.successCount.textContent = state.successChecks;
+          elements.alertCount.textContent = state.alerts;
+          elements.emptyState.classList.toggle('hidden', state.monitors.length > 0);
+
+          const fragment = document.createDocumentFragment();
+          const productMap = new Map(state.products.map((product) => [product.id, product]));
+
+          state.monitors.forEach((monitor) => {
+            const product = productMap.get(monitor.productId);
+            if (!product) {
+              return;
+            }
+            const row = elements.rowTemplate.content.firstElementChild.cloneNode(true);
+            const nameEl = row.querySelector('[data-field="name"]');
+            const urlEl = row.querySelector('[data-field="url"]');
+            const targetEl = row.querySelector('[data-field="target"]');
+            const priceEl = row.querySelector('[data-field="last-price"]');
+            const statusEl = row.querySelector('[data-field="status"]');
+            const checkedEl = row.querySelector('[data-field="checked"]');
+
+            nameEl.textContent = product.title;
+            urlEl.textContent = product.url;
+            urlEl.href = product.url;
+            targetEl.innerHTML =
+              monitor.targetPrice !== null ? formatCurrency(monitor.targetPrice) : '<span class="text-slate-500">—</span>';
+            const priceSource = monitor.lastSeenPrice !== null && monitor.lastSeenPrice !== undefined ? monitor.lastSeenPrice : product.price;
+            priceEl.innerHTML =
+              priceSource !== null && priceSource !== undefined
+                ? formatCurrency(priceSource)
+                : '<span class="text-slate-500">—</span>';
+            checkedEl.textContent = monitor.lastChecked ? toIsoString(new Date(monitor.lastChecked)) : '—';
+
+            const level = monitor.statusLevel || 'neutral';
+            statusEl.textContent = monitor.status || 'Idle';
+            statusEl.className = `inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+              level === 'alert'
+                ? 'bg-rose-500/20 text-rose-200'
+                : level === 'success'
+                ? 'bg-emerald-500/20 text-emerald-200'
+                : level === 'warning'
+                ? 'bg-amber-400/20 text-amber-100'
+                : 'bg-slate-800 text-slate-200'
+            }`;
+
+            row.querySelector('[data-action="check"]').addEventListener('click', () => {
+              runCheck(product.id, true);
+            });
+
+            row.querySelector('[data-action="remove"]').addEventListener('click', () => {
+              removeSneaker(product.id);
+            });
+
+            row.querySelector('[data-action="rename"]').addEventListener('click', () => {
+              renameSneaker(product.id);
+            });
+
+            if (monitor.targetPrice !== null && priceSource !== null && priceSource !== undefined && Number(priceSource) <= Number(monitor.targetPrice)) {
+              row.classList.add('bg-emerald-500/10');
+            }
+
+            fragment.appendChild(row);
+          });
+
+          elements.tableBody.appendChild(fragment);
+        };
+
+        const parsePriceValue = (value) => {
+          if (value === null || value === undefined || value === '') {
+            return null;
+          }
+          const numeric = Number(value);
+          if (Number.isNaN(numeric) || numeric < 0) {
+            return null;
+          }
+          return Number(numeric.toFixed(2));
+        };
+
+        const createProductFromUrl = (parsedUrl) => {
+          const slugSegments = parsedUrl.pathname.split('/').filter(Boolean);
+          const slug = slugSegments[slugSegments.length - 1] || parsedUrl.hostname;
+          const derivedSku = parsedUrl.searchParams.get('sku') || slug.replace(/[^a-z0-9]/gi, '').toUpperCase();
+          const nowIso = new Date().toISOString();
+
+          return canonicalizeProduct({
+            id: generateId(parsedUrl.href),
+            site: parsedUrl.hostname,
+            title: parseUrlToName(parsedUrl.href),
+            sku: derivedSku.slice(0, 32),
+            price: null,
+            sizes: [],
+            image: '',
+            url: parsedUrl.href,
+            lastUpdated: nowIso
+          });
+        };
+
+        const addSneaker = (url, targetPrice) => {
+          const normalizedUrl = url.trim();
+          if (!normalizedUrl) {
+            logEvent('Enter a valid sneaker URL before adding.', 'warning');
+            return;
+          }
+          let parsedUrl;
+          try {
+            parsedUrl = new URL(normalizedUrl);
+          } catch (error) {
+            logEvent('Invalid URL. Please double-check and try again.', 'error');
+            return;
+          }
+
+          const productId = generateId(parsedUrl.href);
+          const existingMonitor = state.monitors.find((monitor) => monitor.productId === productId);
+          if (existingMonitor) {
+            logEvent('This sneaker is already being tracked.', 'warning');
+            return;
+          }
+
+          let product = state.products.find((item) => item.id === productId);
+          if (!product) {
+            product = createProductFromUrl(parsedUrl);
+            state.products.push(product);
+          }
+
+          const monitor = canonicalizeMonitor({
+            productId,
+            targetPrice: parsePriceValue(targetPrice),
+            lastSeenPrice: product.price,
+            lastChecked: null,
+            status: 'Idle',
+            statusLevel: 'neutral'
+          });
+
+          state.monitors.push(monitor);
+          persist();
+          render();
+          logEvent(`Now monitoring ${product.title}.`, 'success');
+        };
+
+        const removeSneaker = (productId) => {
+          const monitorIndex = state.monitors.findIndex((item) => item.productId === productId);
+          if (monitorIndex === -1) return;
+          const [removedMonitor] = state.monitors.splice(monitorIndex, 1);
+          const product = state.products.find((item) => item.id === productId);
+          if (!state.monitors.some((item) => item.productId === productId)) {
+            state.products = state.products.filter((item) => item.id !== productId);
+          }
+          persist();
+          render();
+          if (product) {
+            logEvent(`Stopped monitoring ${product.title}.`, 'warning');
+          } else if (removedMonitor) {
+            logEvent('Removed an orphaned product monitor.', 'warning');
+          }
+        };
+
+        const renameSneaker = (productId) => {
+          const product = state.products.find((item) => item.id === productId);
+          if (!product) return;
+          const newName = prompt('Rename sneaker', product.title);
+          if (!newName) {
+            return;
+          }
+          const trimmed = newName.trim();
+          if (!trimmed) {
+            return;
+          }
+          product.title = trimmed;
+          product.lastUpdated = new Date().toISOString();
+          persist();
+          render();
+          logEvent(`Renamed tracker to ${product.title}.`, 'info');
+        };
+
+        const randomPrice = (base = 200) => {
+          const safeBase = Number.isFinite(base) && base > 0 ? base : 200;
+          const variance = Math.random() * 120 - 60;
+          const raw = Math.max(60, safeBase + variance);
+          return Number(raw.toFixed(2));
+        };
+
+        const randomStatus = () => {
+          const roll = Math.random();
+          if (roll > 0.82) return { status: 'Restock spotted', level: 'alert' };
+          if (roll > 0.6) return { status: 'Low inventory', level: 'warning' };
+          if (roll > 0.35) return { status: 'In stock', level: 'success' };
+          return { status: 'No change', level: 'neutral' };
+        };
+
+        const runCheck = (productId, manual = false) => {
+          const monitor = state.monitors.find((item) => item.productId === productId);
+          const product = state.products.find((item) => item.id === productId);
+          if (!monitor || !product) return;
+
+          const price = randomPrice(monitor.targetPrice ?? product.price ?? 200);
+          const { status, level } = randomStatus();
+          const now = new Date();
+
+          monitor.lastSeenPrice = price;
+          monitor.lastChecked = now.toISOString();
+          monitor.status = status;
+          monitor.statusLevel = level;
+
+          product.price = price;
+          product.lastUpdated = now.toISOString();
+          product.sizes = simulateSizeAvailability();
+
+          if (level === 'success' || level === 'alert') {
+            state.successChecks += 1;
+          }
+
+          if (monitor.targetPrice !== null && price <= monitor.targetPrice) {
+            const formatted = formatCurrency(price).replace(/<[^>]*>/g, '');
+            monitor.status = `Price drop: ${formatted}`;
+            monitor.statusLevel = 'alert';
+            state.alerts += 1;
+            logEvent(`${product.title}: hit target price at ${formatted}!`, 'success');
+          } else {
+            const formatted = formatCurrency(price).replace(/<[^>]*>/g, '');
+            logEvent(`${product.title}: ${status.toLowerCase()} (est. ${formatted}).`, level === 'alert' ? 'warning' : 'info');
+          }
+
+          persist();
+          render();
+          elements.heartbeat.textContent = toIsoString(now);
+
+          if (manual) {
+            elements.heartbeat.classList.add('text-emerald-300');
+            setTimeout(() => elements.heartbeat.classList.remove('text-emerald-300'), 1200);
+          }
+        };
+
+        const runAllChecks = () => {
+          if (!state.monitors.length) return;
+          state.monitors.forEach((monitor) => runCheck(monitor.productId, false));
+        };
+
+        const startAutoRefresh = () => {
+          if (state.timer) clearInterval(state.timer);
+          state.timer = setInterval(runAllChecks, cadenceMs);
+          elements.cadence.textContent = `${Math.round(cadenceMs / 1000)}s`;
+        };
+
+        const bootstrapState = () => {
+          const snapshot = loadProducts();
+          state.products = snapshot.products;
+          state.successChecks = snapshot.successChecks;
+          state.alerts = snapshot.alerts;
+          const validIds = new Set(state.products.map((product) => product.id));
+          const sanitizedMonitors = snapshot.monitors.filter((monitor) => validIds.has(monitor.productId));
+          state.monitors = sanitizedMonitors;
+          if (sanitizedMonitors.length !== snapshot.monitors.length) {
+            persist();
+          }
+        };
+
+        elements.form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          const urlValue = elements.url.value;
+          const priceValue = elements.price.value;
+          addSneaker(urlValue, priceValue);
+          elements.form.reset();
+          elements.url.focus();
+        });
+
+        elements.purgeButton.addEventListener('click', () => {
+          if (!confirm('This will remove all tracked sneakers and clear stored activity. Continue?')) {
+            return;
+          }
+          state.products = [];
+          state.monitors = [];
+          state.alerts = 0;
+          state.successChecks = 0;
+          try {
+            localStorage.removeItem(storageKey);
+          } catch (error) {
+            // ignore removal issues
+          }
+          persist();
+          render();
+          elements.log.innerHTML = '';
+          logEvent('Storage cleared and monitor reset.', 'warning');
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            runAllChecks();
+          }
+        });
+
+        bootstrapState();
+        render();
+        startAutoRefresh();
+
+        if (hydrationWarningMessage) {
+          logEvent(hydrationWarningMessage, 'warning');
+        }
+
+        if (!state.monitors.length) {
+          logEvent('Welcome! Add a sneaker URL to begin monitoring.', 'info');
+        } else {
+          logEvent('Monitor restored from previous session.', 'info');
+          runAllChecks();
+        }
+      })();
+    </script>
+
+  </body>
+</html>
