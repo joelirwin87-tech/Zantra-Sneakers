@@ -295,6 +295,15 @@
           }).format(numeric);
         };
 
+        const formatCurrencyPlain = (value) => {
+          if (value === null || value === undefined) {
+            return null;
+          }
+          const formatted = formatCurrency(value);
+          return formatted.replace(/<[^>]*>/g, '');
+        };
+
+
         const parseUrlToName = (urlString) => {
           try {
             const parsed = new URL(urlString);
@@ -934,6 +943,59 @@
           }
         };
 
+        const logChange = (diff, product) => {
+          if (!diff || !product) return;
+          const { priceChanged, oldPrice, newPrice, newSizes, removedSizes } = diff;
+          const hasPriceChange = Boolean(priceChanged);
+          const addedSizes = Array.isArray(newSizes) ? newSizes : [];
+          const droppedSizes = Array.isArray(removedSizes) ? removedSizes : [];
+          if (!hasPriceChange && !addedSizes.length && !droppedSizes.length) {
+            return;
+          }
+
+          const changes = [];
+          if (hasPriceChange) {
+            const oldLabel = formatCurrencyPlain(oldPrice) ?? 'unknown';
+            const newLabel = formatCurrencyPlain(newPrice) ?? 'unknown';
+            if (oldPrice === null && newPrice !== null) {
+              changes.push(`price set to ${newLabel}`);
+            } else if (oldPrice !== null && newPrice === null) {
+              changes.push(`price removed (was ${oldLabel})`);
+            } else {
+              changes.push(`price changed from ${oldLabel} to ${newLabel}`);
+            }
+          }
+          if (addedSizes.length) {
+            changes.push(`added sizes ${addedSizes.join(', ')}`);
+          }
+          if (droppedSizes.length) {
+            changes.push(`removed sizes ${droppedSizes.join(', ')}`);
+          }
+          if (!changes.length) {
+            return;
+          }
+
+          let level = 'info';
+          if (hasPriceChange && oldPrice !== null && newPrice !== null) {
+            if (newPrice < oldPrice) {
+              level = 'success';
+            } else if (newPrice > oldPrice) {
+              level = 'warning';
+            }
+          } else if (hasPriceChange && newPrice === null) {
+            level = 'warning';
+          } else if (!hasPriceChange) {
+            if (addedSizes.length && !droppedSizes.length) {
+              level = 'success';
+            } else if (droppedSizes.length && !addedSizes.length) {
+              level = 'warning';
+            }
+          }
+
+          logEvent(`${product.title}: ${changes.join('; ')}.`, level);
+        };
+
+
         const persist = () => {
           try {
             saveProducts({
@@ -1033,6 +1095,37 @@
           }
           return Number(numeric.toFixed(2));
         };
+
+        const detectChanges = (oldProduct, newProduct) => {
+          const safeOld = oldProduct && typeof oldProduct === 'object' ? oldProduct : {};
+          const safeNew = newProduct && typeof newProduct === 'object' ? newProduct : {};
+
+          const normalizePrice = (price) => {
+            const numeric = Number(price);
+            return Number.isFinite(numeric) ? Number(numeric.toFixed(2)) : null;
+          };
+
+          const normalizeSizes = (sizes) => (Array.isArray(sizes) ? uniqueSizes(sizes) : []);
+
+          const oldPrice = normalizePrice(safeOld.price);
+          const newPrice = normalizePrice(safeNew.price);
+          const oldSizes = normalizeSizes(safeOld.sizes);
+          const freshSizes = normalizeSizes(safeNew.sizes);
+
+          const priceChanged =
+            (oldPrice === null && newPrice !== null) ||
+            (oldPrice !== null && newPrice === null) ||
+            (oldPrice !== null && newPrice !== null && oldPrice !== newPrice);
+
+          return {
+            priceChanged,
+            oldPrice,
+            newPrice,
+            newSizes: freshSizes.filter((size) => !oldSizes.includes(size)),
+            removedSizes: oldSizes.filter((size) => !freshSizes.includes(size))
+          };
+        };
+
 
         const createProductFromUrl = (parsedUrl) => {
           const slugSegments = parsedUrl.pathname.split('/').filter(Boolean);
@@ -1153,9 +1246,16 @@
           const product = state.products.find((item) => item.id === productId);
           if (!monitor || !product) return;
 
-          const previousPrice = monitor.lastSeenPrice ?? product.price ?? null;
-          const previousSizes = Array.isArray(product.sizes) ? [...product.sizes] : [];
+          const baselineProduct = {
+            ...product,
+            price: Number.isFinite(product.price) ? Number(product.price) : null,
+            sizes: Array.isArray(product.sizes) ? [...product.sizes] : []
+          };
+          const previousPrice = monitor.lastSeenPrice ?? baselineProduct.price ?? null;
+          const firstCheck = !monitor.lastChecked;
           let successRecorded = false;
+          let diffResult = null;
+
 
           monitor.status = 'Checking…';
           monitor.statusLevel = 'neutral';
@@ -1172,12 +1272,8 @@
               if (liveProduct.site) product.site = liveProduct.site;
 
               if (Array.isArray(liveProduct.sizes) && liveProduct.sizes.length) {
-                const normalizedSizes = uniqueSizes(liveProduct.sizes);
-                const newSizes = normalizedSizes.filter((size) => !previousSizes.includes(size));
-                product.sizes = normalizedSizes;
-                if (newSizes.length) {
-                  logEvent(`${product.title}: new sizes available - ${newSizes.join(', ')}.`, 'success');
-                }
+                product.sizes = uniqueSizes(liveProduct.sizes);
+
               }
 
               if (liveProduct.price !== null && liveProduct.price !== undefined) {
@@ -1188,6 +1284,12 @@
 
             product.lastUpdated = completedAt.toISOString();
             monitor.lastChecked = completedAt.toISOString();
+
+            diffResult = detectChanges(baselineProduct, {
+              ...product,
+              sizes: Array.isArray(product.sizes) ? [...product.sizes] : []
+            });
+
 
             let statusLevel = 'neutral';
             let statusMessage = 'No change';
@@ -1244,6 +1346,12 @@
             monitor.status = fallbackStatus.status;
             monitor.statusLevel = fallbackStatus.level;
 
+            diffResult = detectChanges(baselineProduct, {
+              ...product,
+              sizes: Array.isArray(product.sizes) ? [...product.sizes] : []
+            });
+
+
             if ((fallbackStatus.level === 'success' || fallbackStatus.level === 'alert') && !successRecorded) {
               state.successChecks += 1;
               successRecorded = true;
@@ -1264,6 +1372,10 @@
               logEvent(`${product.title}: live fetch failed (${reason}). Using simulated data.`, 'warning');
             }
           } finally {
+            if (!firstCheck && diffResult) {
+              logChange(diffResult, product);
+            }
+
             persist();
             render();
             const lastChecked = monitor.lastChecked ? new Date(monitor.lastChecked) : new Date();
