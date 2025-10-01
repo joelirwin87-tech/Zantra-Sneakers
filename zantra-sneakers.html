@@ -249,8 +249,11 @@
 
     <script>
       (() => {
-        const storageKey = 'zantraSneakerMonitor/v1';
+        const storageKey = 'zantraSneakerMonitor/v2';
         const cadenceMs = 30000;
+        let hydrationWarningMessage = null;
+
+
         const elements = {
           form: document.getElementById('watch-form'),
           url: document.getElementById('sneaker-url'),
@@ -268,7 +271,9 @@
         };
 
         const state = {
-          sneakers: [],
+          products: [],
+          monitors: [],
+
           successChecks: 0,
           alerts: 0,
           timer: null
@@ -303,32 +308,134 @@
           }
         };
 
-        const persist = () => {
-          const payload = {
-            sneakers: state.sneakers,
-            successChecks: state.successChecks,
-            alerts: state.alerts
+        const generateId = (url) => {
+          const normalized = (url || '').trim().toLowerCase();
+          if (!normalized) {
+            return `prd_${Math.random().toString(36).slice(2, 10)}`;
+          }
+          let hash = 0;
+          for (let index = 0; index < normalized.length; index += 1) {
+            hash = (hash << 5) - hash + normalized.charCodeAt(index);
+            hash |= 0;
+          }
+          return `prd_${Math.abs(hash).toString(36)}`;
+        };
+
+        const defaultSnapshot = () => ({
+          products: [],
+          monitors: [],
+          successChecks: 0,
+          alerts: 0
+        });
+
+        const canonicalizeProduct = (candidate) => {
+          if (!candidate || typeof candidate !== 'object') return null;
+          const url = typeof candidate.url === 'string' ? candidate.url.trim() : '';
+          const id = typeof candidate.id === 'string' && candidate.id ? candidate.id : generateId(url || candidate.title || Date.now().toString());
+          let site = typeof candidate.site === 'string' ? candidate.site.trim() : '';
+          if (!site && url) {
+            try {
+              site = new URL(url).hostname;
+            } catch (error) {
+              site = '';
+            }
+          }
+          const title = typeof candidate.title === 'string' && candidate.title.trim() ? candidate.title.trim() : 'Untitled Sneaker';
+          const sku = typeof candidate.sku === 'string' ? candidate.sku.trim().slice(0, 32).toUpperCase() : '';
+          const priceValue = Number(candidate.price);
+          const price = Number.isFinite(priceValue) ? Number(priceValue.toFixed(2)) : null;
+          const sizes = Array.isArray(candidate.sizes)
+            ? candidate.sizes
+                .map((size) => String(size).trim())
+                .filter(Boolean)
+            : [];
+          const image = typeof candidate.image === 'string' ? candidate.image.trim() : '';
+          const lastUpdated =
+            candidate.lastUpdated && !Number.isNaN(Date.parse(candidate.lastUpdated))
+              ? new Date(candidate.lastUpdated).toISOString()
+              : new Date().toISOString();
+
+          return {
+            id,
+            site,
+            title,
+            sku,
+            price,
+            sizes,
+            image,
+            url,
+            lastUpdated
           };
+        };
+
+        const canonicalizeMonitor = (candidate) => {
+          if (!candidate || typeof candidate !== 'object') return null;
+          const allowedLevels = new Set(['alert', 'success', 'warning', 'neutral']);
+          const priceValue = Number(candidate.targetPrice);
+          const lastSeenValue = Number(candidate.lastSeenPrice);
+          const lastChecked =
+            candidate.lastChecked && !Number.isNaN(Date.parse(candidate.lastChecked))
+              ? new Date(candidate.lastChecked).toISOString()
+              : null;
+
+          return {
+            productId: typeof candidate.productId === 'string' ? candidate.productId : '',
+            targetPrice: Number.isFinite(priceValue) && priceValue >= 0 ? Number(priceValue.toFixed(2)) : null,
+            lastSeenPrice: Number.isFinite(lastSeenValue) ? Number(lastSeenValue.toFixed(2)) : null,
+            lastChecked,
+            status: typeof candidate.status === 'string' ? candidate.status : 'Idle',
+            statusLevel: allowedLevels.has(candidate.statusLevel) ? candidate.statusLevel : 'neutral'
+          };
+        };
+
+        const loadProducts = () => {
           try {
-            localStorage.setItem(storageKey, JSON.stringify(payload));
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) {
+              return defaultSnapshot();
+            }
+            const parsed = JSON.parse(raw);
+            const snapshot = defaultSnapshot();
+            if (Array.isArray(parsed.products)) {
+              snapshot.products = parsed.products.map(canonicalizeProduct).filter(Boolean);
+            }
+            if (Array.isArray(parsed.monitors)) {
+              snapshot.monitors = parsed.monitors.map(canonicalizeMonitor).filter((monitor) => monitor && monitor.productId);
+            }
+            if (Number.isFinite(parsed.successChecks)) {
+              snapshot.successChecks = parsed.successChecks;
+            }
+            if (Number.isFinite(parsed.alerts)) {
+              snapshot.alerts = parsed.alerts;
+            }
+            return snapshot;
           } catch (error) {
-            logEvent('Unable to persist watchlist to local storage.', 'error');
+            hydrationWarningMessage = 'Stored data was corrupted and has been reset.';
+            localStorage.removeItem(storageKey);
+            return defaultSnapshot();
           }
         };
 
-        const hydrate = () => {
-          try {
-            const raw = localStorage.getItem(storageKey);
-            if (!raw) return;
-            const parsed = JSON.parse(raw);
-            state.sneakers = Array.isArray(parsed.sneakers) ? parsed.sneakers : [];
-            state.successChecks = Number.isFinite(parsed.successChecks) ? parsed.successChecks : 0;
-            state.alerts = Number.isFinite(parsed.alerts) ? parsed.alerts : 0;
-          } catch (error) {
-            logEvent('Stored data was corrupted and has been reset.', 'warning');
-            localStorage.removeItem(storageKey);
-          }
+        const saveProducts = (snapshot) => {
+          const sanitized = {
+            products: Array.isArray(snapshot.products)
+              ? snapshot.products.map(canonicalizeProduct).filter(Boolean)
+              : [],
+            monitors: Array.isArray(snapshot.monitors)
+              ? snapshot.monitors.map(canonicalizeMonitor).filter((monitor) => monitor && monitor.productId)
+              : [],
+            successChecks: Number.isFinite(snapshot.successChecks) ? snapshot.successChecks : 0,
+            alerts: Number.isFinite(snapshot.alerts) ? snapshot.alerts : 0
+          };
+          localStorage.setItem(storageKey, JSON.stringify(sanitized));
         };
+
+        const simulateSizeAvailability = () => {
+          const baseSizes = ['US 6', 'US 7', 'US 8', 'US 9', 'US 10', 'US 11', 'US 12', 'US 13'];
+          const available = baseSizes.filter(() => Math.random() > 0.45);
+          return available.length ? available : ['US 9', 'US 10'];
+        };
+
 
         const toIsoString = (date) => {
           return date.toLocaleString([], {
@@ -338,63 +445,6 @@
             month: 'short',
             day: 'numeric'
           });
-        };
-
-        const render = () => {
-          elements.tableBody.innerHTML = '';
-          elements.watchCount.textContent = `${state.sneakers.length} sneaker${state.sneakers.length === 1 ? '' : 's'} tracked`;
-          elements.successCount.textContent = state.successChecks;
-          elements.alertCount.textContent = state.alerts;
-          elements.emptyState.classList.toggle('hidden', state.sneakers.length > 0);
-
-          const fragment = document.createDocumentFragment();
-          state.sneakers.forEach((sneaker) => {
-            const row = elements.rowTemplate.content.firstElementChild.cloneNode(true);
-            const nameEl = row.querySelector('[data-field="name"]');
-            const urlEl = row.querySelector('[data-field="url"]');
-            const targetEl = row.querySelector('[data-field="target"]');
-            const priceEl = row.querySelector('[data-field="last-price"]');
-            const statusEl = row.querySelector('[data-field="status"]');
-            const checkedEl = row.querySelector('[data-field="checked"]');
-
-            nameEl.textContent = sneaker.name;
-            urlEl.textContent = sneaker.url;
-            urlEl.href = sneaker.url;
-            targetEl.innerHTML = sneaker.targetPrice ? formatCurrency(sneaker.targetPrice) : '<span class="text-slate-500">—</span>';
-            priceEl.innerHTML = sneaker.lastSeenPrice ? formatCurrency(sneaker.lastSeenPrice) : '<span class="text-slate-500">—</span>';
-            checkedEl.textContent = sneaker.lastChecked ? toIsoString(new Date(sneaker.lastChecked)) : '—';
-
-            statusEl.textContent = sneaker.status || 'Idle';
-            statusEl.className = `inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
-              sneaker.statusLevel === 'alert'
-                ? 'bg-rose-500/20 text-rose-200'
-                : sneaker.statusLevel === 'success'
-                ? 'bg-emerald-500/20 text-emerald-200'
-                : sneaker.statusLevel === 'warning'
-                ? 'bg-amber-400/20 text-amber-100'
-                : 'bg-slate-800 text-slate-200'
-            }`;
-
-            row.querySelector('[data-action="check"]').addEventListener('click', () => {
-              runCheck(sneaker.id, true);
-            });
-
-            row.querySelector('[data-action="remove"]').addEventListener('click', () => {
-              removeSneaker(sneaker.id);
-            });
-
-            row.querySelector('[data-action="rename"]').addEventListener('click', () => {
-              renameSneaker(sneaker.id);
-            });
-
-            if (sneaker.targetPrice && sneaker.lastSeenPrice && Number(sneaker.lastSeenPrice) <= Number(sneaker.targetPrice)) {
-              row.classList.add('bg-emerald-500/10');
-            }
-
-            fragment.appendChild(row);
-          });
-
-          elements.tableBody.appendChild(fragment);
         };
 
         const logEvent = (message, level = 'info') => {
@@ -421,6 +471,122 @@
           }
         };
 
+        const persist = () => {
+          try {
+            saveProducts({
+              products: state.products,
+              monitors: state.monitors,
+              successChecks: state.successChecks,
+              alerts: state.alerts
+            });
+          } catch (error) {
+            logEvent('Unable to persist watchlist to local storage.', 'error');
+          }
+        };
+
+        const render = () => {
+          elements.tableBody.innerHTML = '';
+          elements.watchCount.textContent = `${state.monitors.length} sneaker${state.monitors.length === 1 ? '' : 's'} tracked`;
+          elements.successCount.textContent = state.successChecks;
+          elements.alertCount.textContent = state.alerts;
+          elements.emptyState.classList.toggle('hidden', state.monitors.length > 0);
+
+          const fragment = document.createDocumentFragment();
+          const productMap = new Map(state.products.map((product) => [product.id, product]));
+
+          state.monitors.forEach((monitor) => {
+            const product = productMap.get(monitor.productId);
+            if (!product) {
+              return;
+            }
+
+            const row = elements.rowTemplate.content.firstElementChild.cloneNode(true);
+            const nameEl = row.querySelector('[data-field="name"]');
+            const urlEl = row.querySelector('[data-field="url"]');
+            const targetEl = row.querySelector('[data-field="target"]');
+            const priceEl = row.querySelector('[data-field="last-price"]');
+            const statusEl = row.querySelector('[data-field="status"]');
+            const checkedEl = row.querySelector('[data-field="checked"]');
+
+            nameEl.textContent = product.title;
+            urlEl.textContent = product.url;
+            urlEl.href = product.url;
+            targetEl.innerHTML =
+              monitor.targetPrice !== null ? formatCurrency(monitor.targetPrice) : '<span class="text-slate-500">—</span>';
+            const priceSource = monitor.lastSeenPrice !== null && monitor.lastSeenPrice !== undefined ? monitor.lastSeenPrice : product.price;
+            priceEl.innerHTML =
+              priceSource !== null && priceSource !== undefined
+                ? formatCurrency(priceSource)
+                : '<span class="text-slate-500">—</span>';
+            checkedEl.textContent = monitor.lastChecked ? toIsoString(new Date(monitor.lastChecked)) : '—';
+
+            const level = monitor.statusLevel || 'neutral';
+            statusEl.textContent = monitor.status || 'Idle';
+            statusEl.className = `inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+              level === 'alert'
+                ? 'bg-rose-500/20 text-rose-200'
+                : level === 'success'
+                ? 'bg-emerald-500/20 text-emerald-200'
+                : level === 'warning'
+
+                ? 'bg-amber-400/20 text-amber-100'
+                : 'bg-slate-800 text-slate-200'
+            }`;
+
+            row.querySelector('[data-action="check"]').addEventListener('click', () => {
+              runCheck(product.id, true);
+            });
+
+            row.querySelector('[data-action="remove"]').addEventListener('click', () => {
+              removeSneaker(product.id);
+            });
+
+            row.querySelector('[data-action="rename"]').addEventListener('click', () => {
+              renameSneaker(product.id);
+            });
+
+            if (monitor.targetPrice !== null && priceSource !== null && priceSource !== undefined && Number(priceSource) <= Number(monitor.targetPrice)) {
+
+              row.classList.add('bg-emerald-500/10');
+            }
+
+            fragment.appendChild(row);
+          });
+
+          elements.tableBody.appendChild(fragment);
+        };
+
+        const parsePriceValue = (value) => {
+          if (value === null || value === undefined || value === '') {
+            return null;
+          }
+          const numeric = Number(value);
+          if (Number.isNaN(numeric) || numeric < 0) {
+            return null;
+          }
+          return Number(numeric.toFixed(2));
+        };
+
+        const createProductFromUrl = (parsedUrl) => {
+          const slugSegments = parsedUrl.pathname.split('/').filter(Boolean);
+          const slug = slugSegments[slugSegments.length - 1] || parsedUrl.hostname;
+          const derivedSku = parsedUrl.searchParams.get('sku') || slug.replace(/[^a-z0-9]/gi, '').toUpperCase();
+          const nowIso = new Date().toISOString();
+
+          return canonicalizeProduct({
+            id: generateId(parsedUrl.href),
+            site: parsedUrl.hostname,
+            title: parseUrlToName(parsedUrl.href),
+            sku: derivedSku.slice(0, 32),
+            price: null,
+            sizes: [],
+            image: '',
+            url: parsedUrl.href,
+            lastUpdated: nowIso
+          });
+
+        };
+
         const addSneaker = (url, targetPrice) => {
           const normalizedUrl = url.trim();
           if (!normalizedUrl) {
@@ -435,56 +601,75 @@
             return;
           }
 
-          const exists = state.sneakers.some((item) => item.url === parsedUrl.href);
-          if (exists) {
+          const productId = generateId(parsedUrl.href);
+          const existingMonitor = state.monitors.find((monitor) => monitor.productId === productId);
+          if (existingMonitor) {
+
             logEvent('This sneaker is already being tracked.', 'warning');
             return;
           }
 
-          const id = crypto.randomUUID();
-          const sneaker = {
-            id,
-            url: parsedUrl.href,
-            name: parseUrlToName(parsedUrl.href),
-            targetPrice: targetPrice ? Number(targetPrice) : null,
-            lastSeenPrice: null,
+          let product = state.products.find((item) => item.id === productId);
+          if (!product) {
+            product = createProductFromUrl(parsedUrl);
+            state.products.push(product);
+          }
+
+          const monitor = canonicalizeMonitor({
+            productId,
+            targetPrice: parsePriceValue(targetPrice),
+            lastSeenPrice: product.price,
             lastChecked: null,
             status: 'Idle',
             statusLevel: 'neutral'
-          };
+          });
 
-          state.sneakers.unshift(sneaker);
+          state.monitors.push(monitor);
           persist();
           render();
-          logEvent(`Now monitoring ${sneaker.name}.`, 'success');
-          runCheck(id, true);
+          logEvent(`Now monitoring ${product.title}.`, 'success');
         };
 
-        const removeSneaker = (id) => {
-          const index = state.sneakers.findIndex((item) => item.id === id);
-          if (index === -1) return;
-          const [removed] = state.sneakers.splice(index, 1);
+        const removeSneaker = (productId) => {
+          const monitorIndex = state.monitors.findIndex((item) => item.productId === productId);
+          if (monitorIndex === -1) return;
+          const [removedMonitor] = state.monitors.splice(monitorIndex, 1);
+          const product = state.products.find((item) => item.id === productId);
+          if (!state.monitors.some((item) => item.productId === productId)) {
+            state.products = state.products.filter((item) => item.id !== productId);
+          }
           persist();
           render();
-          logEvent(`Stopped monitoring ${removed.name}.`, 'warning');
+          if (product) {
+            logEvent(`Stopped monitoring ${product.title}.`, 'warning');
+          } else if (removedMonitor) {
+            logEvent('Removed an orphaned product monitor.', 'warning');
+          }
         };
 
-        const renameSneaker = (id) => {
-          const sneaker = state.sneakers.find((item) => item.id === id);
-          if (!sneaker) return;
-          const newName = prompt('Rename sneaker', sneaker.name);
+        const renameSneaker = (productId) => {
+          const product = state.products.find((item) => item.id === productId);
+          if (!product) return;
+          const newName = prompt('Rename sneaker', product.title);
           if (!newName) {
             return;
           }
-          sneaker.name = newName.trim() || sneaker.name;
+          const trimmed = newName.trim();
+          if (!trimmed) {
+            return;
+          }
+          product.title = trimmed;
+          product.lastUpdated = new Date().toISOString();
           persist();
           render();
-          logEvent(`Renamed tracker to ${sneaker.name}.`, 'info');
+          logEvent(`Renamed tracker to ${product.title}.`, 'info');
         };
 
         const randomPrice = (base = 200) => {
+          const safeBase = Number.isFinite(base) && base > 0 ? base : 200;
           const variance = Math.random() * 120 - 60;
-          const raw = Math.max(60, base + variance);
+          const raw = Math.max(60, safeBase + variance);
+
           return Number(raw.toFixed(2));
         };
 
@@ -496,29 +681,39 @@
           return { status: 'No change', level: 'neutral' };
         };
 
-        const runCheck = (id, manual = false) => {
-          const sneaker = state.sneakers.find((item) => item.id === id);
-          if (!sneaker) return;
+        const runCheck = (productId, manual = false) => {
+          const monitor = state.monitors.find((item) => item.productId === productId);
+          const product = state.products.find((item) => item.id === productId);
+          if (!monitor || !product) return;
 
-          const price = randomPrice(sneaker.targetPrice || 200);
+          const price = randomPrice(monitor.targetPrice ?? product.price ?? 200);
           const { status, level } = randomStatus();
           const now = new Date();
-          sneaker.lastSeenPrice = price;
-          sneaker.lastChecked = now.toISOString();
-          sneaker.status = status;
-          sneaker.statusLevel = level;
+
+          monitor.lastSeenPrice = price;
+          monitor.lastChecked = now.toISOString();
+          monitor.status = status;
+          monitor.statusLevel = level;
+
+          product.price = price;
+          product.lastUpdated = now.toISOString();
+          product.sizes = simulateSizeAvailability();
+
 
           if (level === 'success' || level === 'alert') {
             state.successChecks += 1;
           }
 
-          if (sneaker.targetPrice && price <= sneaker.targetPrice) {
-            sneaker.status = `Price drop: ${formatCurrency(price).replace(/<[^>]*>/g, '')}`;
-            sneaker.statusLevel = 'alert';
+          if (monitor.targetPrice !== null && price <= monitor.targetPrice) {
+            const formatted = formatCurrency(price).replace(/<[^>]*>/g, '');
+            monitor.status = `Price drop: ${formatted}`;
+            monitor.statusLevel = 'alert';
             state.alerts += 1;
-            logEvent(`${sneaker.name}: hit target price at ${formatCurrency(price).replace(/<[^>]*>/g, '')}!`, 'success');
+            logEvent(`${product.title}: hit target price at ${formatted}!`, 'success');
           } else {
-            logEvent(`${sneaker.name}: ${status.toLowerCase()} (est. ${formatCurrency(price).replace(/<[^>]*>/g, '')}).`, level === 'alert' ? 'warning' : 'info');
+            const formatted = formatCurrency(price).replace(/<[^>]*>/g, '');
+            logEvent(`${product.title}: ${status.toLowerCase()} (est. ${formatted}).`, level === 'alert' ? 'warning' : 'info');
+
           }
 
           persist();
@@ -532,8 +727,9 @@
         };
 
         const runAllChecks = () => {
-          if (!state.sneakers.length) return;
-          state.sneakers.forEach((sneaker) => runCheck(sneaker.id, false));
+          if (!state.monitors.length) return;
+          state.monitors.forEach((monitor) => runCheck(monitor.productId, false));
+
         };
 
         const startAutoRefresh = () => {
@@ -541,6 +737,20 @@
           state.timer = setInterval(runAllChecks, cadenceMs);
           elements.cadence.textContent = `${Math.round(cadenceMs / 1000)}s`;
         };
+
+        const bootstrapState = () => {
+          const snapshot = loadProducts();
+          state.products = snapshot.products;
+          state.successChecks = snapshot.successChecks;
+          state.alerts = snapshot.alerts;
+          const validIds = new Set(state.products.map((product) => product.id));
+          const sanitizedMonitors = snapshot.monitors.filter((monitor) => validIds.has(monitor.productId));
+          state.monitors = sanitizedMonitors;
+          if (sanitizedMonitors.length !== snapshot.monitors.length) {
+            persist();
+          }
+        };
+
 
         elements.form.addEventListener('submit', (event) => {
           event.preventDefault();
@@ -555,9 +765,16 @@
           if (!confirm('This will remove all tracked sneakers and clear stored activity. Continue?')) {
             return;
           }
-          state.sneakers = [];
+          state.products = [];
+          state.monitors = [];
           state.alerts = 0;
           state.successChecks = 0;
+          try {
+            localStorage.removeItem(storageKey);
+          } catch (error) {
+            // ignore removal issues
+          }
+
           persist();
           render();
           elements.log.innerHTML = '';
@@ -570,10 +787,16 @@
           }
         });
 
-        hydrate();
+        bootstrapState();
         render();
         startAutoRefresh();
-        if (!state.sneakers.length) {
+
+        if (hydrationWarningMessage) {
+          logEvent(hydrationWarningMessage, 'warning');
+        }
+
+        if (!state.monitors.length) {
+
           logEvent('Welcome! Add a sneaker URL to begin monitoring.', 'info');
         } else {
           logEvent('Monitor restored from previous session.', 'info');
@@ -581,5 +804,6 @@
         }
       })();
     </script>
+
   </body>
 </html>
