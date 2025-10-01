@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zantra Sneakers Monitor</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-ol8nvxr2idK4USsfx8bVsgcuyo6edSxnl2xe50Tzw9uQWGWpZJYG1ChcxrFAuo0xO+ogzAm8h1Hn0fln+rZ9Yg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <style>
+      ::selection {
+        background-color: #22d3ee;
+        color: #0f172a;
+      }
+      [data-badge]::after {
+        content: attr(data-badge);
+        position: absolute;
+        top: -0.5rem;
+        right: -0.5rem;
+        background: #f97316;
+        color: #0f172a;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1;
+        border-radius: 9999px;
+        padding: 0.25rem 0.5rem;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header class="relative isolate overflow-hidden bg-gradient-to-br from-cyan-400/20 via-slate-900 to-slate-950">
+      <div class="absolute inset-0 opacity-40" aria-hidden="true">
+        <div class="absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-cyan-500/20 blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-emerald-500/20 blur-3xl"></div>
+      </div>
+      <div class="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-16 lg:flex-row lg:items-center lg:justify-between">
+        <div class="max-w-3xl space-y-4">
+          <p class="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-1 text-sm font-semibold text-cyan-200">
+            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+            Real-time drop tracking
+          </p>
+          <h1 class="text-4xl font-black tracking-tight text-white sm:text-5xl">
+            Zantra Sneakers Monitor
+          </h1>
+          <p class="text-lg text-slate-200">
+            Centralize every sneaker drop, restock alert, and price movement in one responsive command center. Track, prioritize, and react faster than the hype.
+          </p>
+        </div>
+        <div class="relative mt-6 flex items-center justify-center lg:mt-0">
+          <div class="relative flex h-32 w-32 items-center justify-center rounded-full border border-cyan-300/50 bg-slate-900/70 shadow-lg shadow-cyan-500/20">
+            <svg class="h-20 w-20 text-cyan-300" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M4 15c.2 2.3 1.7 4 4 4h6.5c3 0 4.5-1.4 4.5-4.5 0-2.3-1.6-4.5-4.5-4.5h-1c-.2 0-.4-.1-.5-.3l-.4-1.1c-.2-.6-.5-.9-1.1-.9H8c-1.5 0-2.3.9-2 2.5l.5 2.4"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+              <path
+                d="M9.5 6.5c0 1 .7 1.7 1.5 1.7S12.5 7.5 12.5 6.5 11.8 5 11 5s-1.5.7-1.5 1.5Z"
+                fill="currentColor"
+              ></path>
+              <path
+                d="M5 19h12"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10">
+      <section aria-labelledby="monitor-form" class="rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-cyan-500/10">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div class="space-y-2">
+            <h2 id="monitor-form" class="text-2xl font-semibold text-white">Add sneaker to watch</h2>
+            <p class="text-sm text-slate-300">
+              Drop a product page URL and optional target price. We will keep eyes on it and surface notable changes instantly.
+            </p>
+          </div>
+          <form id="watch-form" class="flex w-full flex-col gap-4 rounded-2xl bg-slate-950/80 p-4 sm:flex-row sm:items-end">
+            <label class="flex-1 text-sm font-medium text-slate-200">
+              <span class="mb-2 block text-xs uppercase tracking-wide text-slate-400">Sneaker URL</span>
+              <input
+                id="sneaker-url"
+                name="sneaker-url"
+                type="url"
+                required
+                autocomplete="off"
+                placeholder="https://www.zantra.com/sneakers/sb-dunk"
+                class="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-base text-slate-100 placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+              />
+            </label>
+            <label class="w-full text-sm font-medium text-slate-200 sm:w-44">
+              <span class="mb-2 block text-xs uppercase tracking-wide text-slate-400">Target price (USD)</span>
+              <input
+                id="target-price"
+                name="target-price"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="250"
+                class="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-base text-slate-100 placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+              />
+            </label>
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-cyan-400/40 transition hover:translate-y-0.5 hover:bg-cyan-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 focus-visible:ring-cyan-200"
+            >
+              <span class="fa-solid fa-plus"></span>
+              Add to monitor
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section aria-labelledby="monitor-table" class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 id="monitor-table" class="text-2xl font-semibold text-white">Active watchlist</h2>
+          <span id="watch-count" class="text-sm text-slate-400">0 sneakers tracked</span>
+        </div>
+        <div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl shadow-cyan-500/10">
+          <div class="relative overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-800" aria-describedby="monitor-table">
+              <thead class="bg-slate-900/90 text-left text-xs uppercase tracking-wider text-slate-400">
+                <tr>
+                  <th scope="col" class="px-6 py-3">Sneaker</th>
+                  <th scope="col" class="px-6 py-3">Target price</th>
+                  <th scope="col" class="px-6 py-3">Last seen price</th>
+                  <th scope="col" class="px-6 py-3">Status</th>
+                  <th scope="col" class="px-6 py-3">Last checked</th>
+                  <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="sneakers-body" class="divide-y divide-slate-800 text-sm"></tbody>
+            </table>
+          </div>
+          <div id="empty-state" class="flex flex-col items-center gap-3 px-6 py-12 text-center text-slate-400">
+            <span class="rounded-full bg-slate-800/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide">Nothing monitored yet</span>
+            <p class="max-w-md text-sm">
+              Add your first sneaker URL to kickstart live tracking. We will simulate activity so you can test your workflow instantly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="live-feed" class="grid gap-6 lg:grid-cols-5">
+        <div class="lg:col-span-3">
+          <h2 id="live-feed" class="text-2xl font-semibold text-white">Live feed</h2>
+          <div class="mt-4 h-96 overflow-y-auto rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-cyan-500/10">
+            <ol id="activity-log" class="space-y-4 text-sm" aria-live="polite"></ol>
+          </div>
+        </div>
+        <aside class="lg:col-span-2">
+          <div class="relative rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-cyan-500/10">
+            <div class="absolute right-6 top-6" data-badge="LIVE" aria-hidden="true"></div>
+            <h3 class="text-xl font-semibold text-white">Monitor health</h3>
+            <dl class="mt-6 space-y-4 text-sm text-slate-300">
+              <div class="flex items-center justify-between">
+                <dt>Auto-refresh cadence</dt>
+                <dd><span id="cadence">30s</span></dd>
+              </div>
+              <div class="flex items-center justify-between">
+                <dt>Last heartbeat</dt>
+                <dd id="heartbeat">—</dd>
+              </div>
+              <div class="flex items-center justify-between">
+                <dt>Successful checks</dt>
+                <dd id="success-count">0</dd>
+              </div>
+              <div class="flex items-center justify-between">
+                <dt>Alerts dispatched</dt>
+                <dd id="alert-count">0</dd>
+              </div>
+            </dl>
+            <button
+              id="purge-storage"
+              type="button"
+              class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-rose-400/40 bg-rose-500/20 px-4 py-3 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/60"
+            >
+              <span class="fa-solid fa-trash"></span>
+              Clear stored data
+            </button>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-800 bg-slate-950/80">
+      <div class="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+        <p class="flex items-center gap-2">
+          <span class="fa-solid fa-bolt text-cyan-300"></span>
+          Built for rapid-fire sneaker intel.
+        </p>
+        <nav aria-label="Footer" class="flex flex-wrap items-center gap-4 text-xs uppercase tracking-wide">
+          <a href="#monitor-form" class="text-slate-300 transition hover:text-white">Add watch</a>
+          <a href="#monitor-table" class="text-slate-300 transition hover:text-white">Watchlist</a>
+          <a href="#live-feed" class="text-slate-300 transition hover:text-white">Live feed</a>
+        </nav>
+      </div>
+    </footer>
+
+    <template id="sneaker-row-template">
+      <tr class="transition hover:bg-slate-900/80">
+        <td class="whitespace-nowrap px-6 py-4">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-200">
+              <span class="fa-solid fa-shoe-prints"></span>
+            </span>
+            <div>
+              <p class="font-medium text-white" data-field="name"></p>
+              <a data-field="url" class="text-xs text-cyan-300 underline-offset-4 hover:underline" target="_blank" rel="noopener"></a>
+            </div>
+          </div>
+        </td>
+        <td class="whitespace-nowrap px-6 py-4" data-field="target"></td>
+        <td class="whitespace-nowrap px-6 py-4" data-field="last-price"></td>
+        <td class="whitespace-nowrap px-6 py-4">
+          <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold" data-field="status"></span>
+        </td>
+        <td class="whitespace-nowrap px-6 py-4" data-field="checked"></td>
+        <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+          <div class="flex flex-wrap justify-end gap-2">
+            <button type="button" data-action="check" class="inline-flex items-center gap-2 rounded-lg bg-emerald-500/20 px-3 py-2 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40">
+              <span class="fa-solid fa-rotate"></span>
+              Check now
+            </button>
+            <button type="button" data-action="rename" class="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40">
+              <span class="fa-solid fa-pen"></span>
+              Rename
+            </button>
+            <button type="button" data-action="remove" class="inline-flex items-center gap-2 rounded-lg bg-rose-500/20 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/60">
+              <span class="fa-solid fa-xmark"></span>
+              Remove
+            </button>
+          </div>
+        </td>
+      </tr>
+    </template>
+
+    <script>
+      (() => {
+        const storageKey = 'zantraSneakerMonitor/v2';
+        const cadenceMs = 30000;
+        let hydrationWarningMessage = null;
+
+        const elements = {
+          form: document.getElementById('watch-form'),
+          url: document.getElementById('sneaker-url'),
+          price: document.getElementById('target-price'),
+          tableBody: document.getElementById('sneakers-body'),
+          emptyState: document.getElementById('empty-state'),
+          log: document.getElementById('activity-log'),
+          cadence: document.getElementById('cadence'),
+          heartbeat: document.getElementById('heartbeat'),
+          successCount: document.getElementById('success-count'),
+          alertCount: document.getElementById('alert-count'),
+          watchCount: document.getElementById('watch-count'),
+          purgeButton: document.getElementById('purge-storage'),
+          rowTemplate: document.getElementById('sneaker-row-template')
+        };
+
+        const state = {
+          products: [],
+          monitors: [],
+          successChecks: 0,
+          alerts: 0,
+          timer: null,
+          isRefreshing: false
+        };
+
+        const formatCurrency = (value) => {
+          if (value === null || value === undefined || value === '') {
+            return '<span class="text-slate-500">—</span>';
+          }
+          const numeric = Number(value);
+          if (Number.isNaN(numeric)) {
+            return '<span class="text-slate-500">—</span>';
+          }
+          return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 2
+          }).format(numeric);
+        };
+
+        const formatCurrencyPlain = (value) => {
+          if (value === null || value === undefined) {
+            return null;
+          }
+          const formatted = formatCurrency(value);
+          return formatted.replace(/<[^>]*>/g, '');
+        };
+
+        const parseUrlToName = (urlString) => {
+          try {
+            const parsed = new URL(urlString);
+            const segments = parsed.pathname.split('/').filter(Boolean);
+            if (!segments.length) return parsed.hostname;
+            return segments[segments.length - 1]
+              .replace(/[-_]+/g, ' ')
+              .replace(/\s+/g, ' ')
+              .replace(/\b\w/g, (c) => c.toUpperCase());
+          } catch (error) {
+            return 'Untitled Sneaker';
+          }
+        };
+
+        const generateId = (url) => {
+          const normalized = (url || '').trim().toLowerCase();
+          if (!normalized) {
+            return `prd_${Math.random().toString(36).slice(2, 10)}`;
+          }
+          let hash = 0;
+          for (let index = 0; index < normalized.length; index += 1) {
+            hash = (hash << 5) - hash + normalized.charCodeAt(index);
+            hash |= 0;
+          }
+          return `prd_${Math.abs(hash).toString(36)}`;
+        };
+
+        const defaultSnapshot = () => ({
+          products: [],
+          monitors: [],
+          successChecks: 0,
+          alerts: 0
+        });
+
+        const canonicalizeProduct = (candidate) => {
+          if (!candidate || typeof candidate !== 'object') return null;
+          const url = typeof candidate.url === 'string' ? candidate.url.trim() : '';
+          const id = typeof candidate.id === 'string' && candidate.id ? candidate.id : generateId(url || candidate.title || Date.now().toString());
+          let site = typeof candidate.site === 'string' ? candidate.site.trim() : '';
+          if (!site && url) {
+            try {
+              site = new URL(url).hostname;
+            } catch (error) {
+              site = '';
+            }
+          }
+          const title = typeof candidate.title === 'string' && candidate.title.trim() ? candidate.title.trim() : 'Untitled Sneaker';
+          const sku = typeof candidate.sku === 'string' ? candidate.sku.trim().slice(0, 32).toUpperCase() : '';
+          const priceValue = Number(candidate.price);
+          const price = Number.isFinite(priceValue) ? Number(priceValue.toFixed(2)) : null;
+          const sizes = Array.isArray(candidate.sizes)
+            ? candidate.sizes
+                .map((size) => String(size).trim())
+                .filter(Boolean)
+            : [];
+          const image = typeof candidate.image === 'string' ? candidate.image.trim() : '';
+          const lastUpdated =
+            candidate.lastUpdated && !Number.isNaN(Date.parse(candidate.lastUpdated))
+              ? new Date(candidate.lastUpdated).toISOString()
+              : new Date().toISOString();
+
+          return {
+            id,
+            site,
+            title,
+            sku,
+            price,
+            sizes,
+            image,
+            url,
+            lastUpdated
+          };
+        };
+
+        const canonicalizeMonitor = (candidate) => {
+          if (!candidate || typeof candidate !== 'object') return null;
+          const allowedLevels = new Set(['alert', 'success', 'warning', 'neutral']);
+          const priceValue = Number(candidate.targetPrice);
+          const lastSeenValue = Number(candidate.lastSeenPrice);
+          const lastChecked =
+            candidate.lastChecked && !Number.isNaN(Date.parse(candidate.lastChecked))
+              ? new Date(candidate.lastChecked).toISOString()
+              : null;
+
+          return {
+            productId: typeof candidate.productId === 'string' ? candidate.productId : '',
+            targetPrice: Number.isFinite(priceValue) && priceValue >= 0 ? Number(priceValue.toFixed(2)) : null,
+            lastSeenPrice: Number.isFinite(lastSeenValue) ? Number(lastSeenValue.toFixed(2)) : null,
+            lastChecked,
+            status: typeof candidate.status === 'string' ? candidate.status : 'Idle',
+            statusLevel: allowedLevels.has(candidate.statusLevel) ? candidate.statusLevel : 'neutral'
+          };
+        };
+
+        const loadProducts = () => {
+          try {
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) {
+              return defaultSnapshot();
+            }
+            const parsed = JSON.parse(raw);
+            const snapshot = defaultSnapshot();
+            if (Array.isArray(parsed.products)) {
+              snapshot.products = parsed.products.map(canonicalizeProduct).filter(Boolean);
+            }
+            if (Array.isArray(parsed.monitors)) {
+              snapshot.monitors = parsed.monitors.map(canonicalizeMonitor).filter((monitor) => monitor && monitor.productId);
+            }
+            if (Number.isFinite(parsed.successChecks)) {
+              snapshot.successChecks = parsed.successChecks;
+            }
+            if (Number.isFinite(parsed.alerts)) {
+              snapshot.alerts = parsed.alerts;
+            }
+            return snapshot;
+          } catch (error) {
+            hydrationWarningMessage = 'Stored data was corrupted and has been reset.';
+            localStorage.removeItem(storageKey);
+            return defaultSnapshot();
+          }
+        };
+
+        const saveProducts = (snapshot) => {
+          const sanitized = {
+            products: Array.isArray(snapshot.products)
+              ? snapshot.products.map(canonicalizeProduct).filter(Boolean)
+              : [],
+            monitors: Array.isArray(snapshot.monitors)
+              ? snapshot.monitors.map(canonicalizeMonitor).filter((monitor) => monitor && monitor.productId)
+              : [],
+            successChecks: Number.isFinite(snapshot.successChecks) ? snapshot.successChecks : 0,
+            alerts: Number.isFinite(snapshot.alerts) ? snapshot.alerts : 0
+          };
+          localStorage.setItem(storageKey, JSON.stringify(sanitized));
+        };
+
+        const parsePriceString = (value) => {
+          if (value === null || value === undefined) return null;
+          if (typeof value === 'number' && Number.isFinite(value)) {
+            return Number(value.toFixed(2));
+          }
+          const raw = String(value);
+          const cleaned = raw.replace(/[^0-9.,]/g, '');
+          if (!cleaned) return null;
+          const commaCount = (cleaned.match(/,/g) || []).length;
+          const dotCount = (cleaned.match(/\./g) || []).length;
+          let normalized = cleaned;
+          if (commaCount && commaCount > dotCount) {
+            normalized = normalized.replace(/\./g, '').replace(/,/g, '.');
+          } else {
+            normalized = normalized.replace(/,/g, '');
+          }
+          const parsed = Number(normalized);
+          return Number.isFinite(parsed) ? Number(parsed.toFixed(2)) : null;
+        };
+
+        const getMetaContent = (doc, selectors) => {
+          for (const selector of selectors) {
+            const element = doc.querySelector(selector);
+            if (element) {
+              const content = element.getAttribute('content') || element.textContent;
+              if (content) {
+                const normalized = content.replace(/\s+/g, ' ').trim();
+                if (normalized) return normalized;
+              }
+            }
+          }
+          return '';
+        };
+
+        const uniqueSizes = (values) => {
+          const set = new Set();
+          values.forEach((value) => {
+            if (value === null || value === undefined) return;
+            const normalized = String(value).replace(/\s+/g, ' ').trim();
+            if (!normalized) return;
+            if (
+              !/(\d|US|UK|EU|CM|XS|S|M|L|XL|XXL|W|Men|Women)/i.test(normalized) &&
+              normalized.length > 8
+            ) {
+              return;
+            }
+            const cleaned = normalized.replace(/^Size\s*/i, '').trim();
+            if (cleaned) {
+              set.add(cleaned);
+            }
+          });
+          return Array.from(set);
+        };
+
+        const collectSizesFromElements = (doc, descriptors) => {
+          const collected = [];
+          descriptors.forEach(({ selector, attribute }) => {
+            doc.querySelectorAll(selector).forEach((element) => {
+              let value = '';
+              if (attribute === 'text') {
+                value = element.textContent;
+              } else if (attribute) {
+                value = element.getAttribute(attribute);
+              } else {
+                value = element.getAttribute('data-size') || element.getAttribute('aria-label') || element.textContent;
+              }
+              if (value) {
+                collected.push(value);
+              }
+            });
+          });
+          return uniqueSizes(collected);
+        };
+
+        const collectSizesFromJsonLdOffers = (offers) => {
+          const collected = [];
+          const offerList = Array.isArray(offers) ? offers : offers ? [offers] : [];
+          offerList.forEach((offer) => {
+            if (!offer || typeof offer !== 'object') return;
+            const { itemOffered, size, description } = offer;
+            if (size) {
+              collected.push(size);
+            }
+            if (itemOffered && typeof itemOffered === 'object') {
+              if (itemOffered.size) {
+                collected.push(itemOffered.size);
+              }
+              if (itemOffered.name) {
+                collected.push(itemOffered.name);
+              }
+            }
+            if (description && typeof description === 'string' && description.length <= 40) {
+              collected.push(description);
+            }
+          });
+          return uniqueSizes(collected);
+        };
+
+        const findProductNode = (node) => {
+          if (!node) return null;
+          if (Array.isArray(node)) {
+            for (const item of node) {
+              const found = findProductNode(item);
+              if (found) return found;
+            }
+            return null;
+          }
+          if (typeof node === 'object') {
+            const type = node['@type'];
+            if (type) {
+              const matches = Array.isArray(type) ? type.includes('Product') : type === 'Product';
+              if (matches) return node;
+            }
+            for (const value of Object.values(node)) {
+              if (value && typeof value === 'object') {
+                const nested = findProductNode(value);
+                if (nested) return nested;
+              }
+            }
+          }
+          return null;
+        };
+
+        const getJsonLdProduct = (doc) => {
+          const scripts = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'));
+          for (const script of scripts) {
+            const text = script.textContent.trim();
+            if (!text) continue;
+            try {
+              const parsed = JSON.parse(text);
+              const product = findProductNode(parsed);
+              if (product) {
+                return product;
+              }
+            } catch (error) {
+              // Ignore JSON errors and continue searching
+            }
+          }
+          return null;
+        };
+
+        const parseOfferPrice = (offers) => {
+          const offerList = Array.isArray(offers) ? offers : offers ? [offers] : [];
+          for (const offer of offerList) {
+            if (!offer || typeof offer !== 'object') continue;
+            const direct = offer.price ?? offer.priceAmount;
+            const specification = offer.priceSpecification;
+            const candidate = direct ?? (specification && (specification.price || specification.priceValue));
+            const parsed = parsePriceString(candidate);
+            if (parsed !== null) {
+              return parsed;
+            }
+          }
+          return null;
+        };
+
+        const parseProductFromJsonLd = (product) => {
+          if (!product || typeof product !== 'object') return {};
+          const title = typeof product.name === 'string' ? product.name : '';
+          const sku = typeof product.sku === 'string' ? product.sku : typeof product.productId === 'string' ? product.productId : '';
+          const image = Array.isArray(product.image)
+            ? product.image.find((item) => typeof item === 'string') || ''
+            : typeof product.image === 'string'
+            ? product.image
+            : '';
+          const price = parseOfferPrice(product.offers);
+          const sizes = collectSizesFromJsonLdOffers(product.offers);
+          return { title, sku, image, price, sizes };
+        };
+
+        const parseAdditionalJson = (doc, predicate) => {
+          const scripts = Array.from(doc.querySelectorAll('script[type="application/json"]'));
+          for (const script of scripts) {
+            const text = script.textContent.trim();
+            if (!text) continue;
+            try {
+              const parsed = JSON.parse(text);
+              const result = predicate(parsed);
+              if (result) {
+                return result;
+              }
+            } catch (error) {
+              // Skip invalid JSON blobs
+            }
+          }
+          return null;
+        };
+
+        const gatherSizesFromObject = (node, depth = 0, set = new Set()) => {
+          if (!node || depth > 6) return set;
+          if (Array.isArray(node)) {
+            node.forEach((item) => gatherSizesFromObject(item, depth + 1, set));
+            return set;
+          }
+          if (typeof node === 'object') {
+            Object.entries(node).forEach(([key, value]) => {
+              if (
+                ['size', 'sizeValue', 'localizedSize', 'displaySize', 'sizeDescription', 'sizeName'].includes(key) &&
+                (typeof value === 'string' || typeof value === 'number')
+              ) {
+                set.add(String(value));
+              }
+              if (
+                ['sizes', 'availableSkus', 'skus', 'children', 'variants', 'availableSizes'].includes(key) &&
+                value &&
+                typeof value === 'object'
+              ) {
+                gatherSizesFromObject(value, depth + 1, set);
+              } else if (value && typeof value === 'object') {
+                gatherSizesFromObject(value, depth + 1, set);
+              }
+            });
+          }
+          return set;
+        };
+
+        const parseFootlockerProduct = (doc, jsonLdProduct) => {
+          const base = parseProductFromJsonLd(jsonLdProduct);
+          const priceMeta = parsePriceString(
+            getMetaContent(doc, [
+              'meta[property="product:price:amount"]',
+              'meta[name="product:price:amount"]',
+              'meta[property="og:price:amount"]',
+              'meta[name="twitter:data1"]'
+            ])
+          );
+          const skuCandidate =
+            doc.querySelector('[data-product-sku]')?.getAttribute('data-product-sku') ||
+            doc.querySelector('input[name="pid"]')?.value ||
+            doc.querySelector('[data-sku]')?.getAttribute('data-sku') ||
+            '';
+          const sizes = uniqueSizes([
+            ...(base.sizes || []),
+            ...collectSizesFromElements(doc, [
+              { selector: 'button[data-qa*="size"]', attribute: 'data-value' },
+              { selector: 'button[data-size]', attribute: 'data-size' },
+              { selector: 'button[data-sku]', attribute: 'data-size' },
+              { selector: 'select[id*="size"] option[value]', attribute: 'text' },
+              { selector: 'li[data-size]', attribute: 'data-size' }
+            ])
+          ]);
+          return {
+            title: base.title || getMetaContent(doc, ['meta[property="og:title"]', 'meta[name="twitter:title"]', 'title']),
+            sku: base.sku || skuCandidate,
+            price: base.price ?? priceMeta,
+            sizes,
+            image: base.image || getMetaContent(doc, ['meta[property="og:image"]', 'meta[name="twitter:image"]'])
+          };
+        };
+
+        const parseJdSportsProduct = (doc, jsonLdProduct) => {
+          const base = parseProductFromJsonLd(jsonLdProduct);
+          const priceMeta = parsePriceString(
+            getMetaContent(doc, [
+              'meta[property="product:price:amount"]',
+              'meta[name="product:price:amount"]',
+              'meta[property="og:price:amount"]',
+              'meta[name="twitter:data1"]'
+            ])
+          );
+          const skuCandidate =
+            doc.querySelector('[data-product-sku]')?.getAttribute('data-product-sku') ||
+            doc.querySelector('[data-testid="product-sku"]')?.textContent ||
+            '';
+          const sizes = uniqueSizes([
+            ...(base.sizes || []),
+            ...collectSizesFromElements(doc, [
+              { selector: 'button[data-testid*="size"]', attribute: 'data-testid' },
+              { selector: 'button[data-e2e*="size"]', attribute: 'data-e2e' },
+              { selector: 'button[data-attr-value]', attribute: 'data-attr-value' },
+              { selector: 'li[data-attr-value]', attribute: 'data-attr-value' },
+              { selector: 'select[id*="size"] option[value]', attribute: 'text' }
+            ])
+          ]);
+          return {
+            title: base.title || getMetaContent(doc, ['meta[property="og:title"]', 'title']),
+            sku: base.sku || (skuCandidate ? skuCandidate.replace(/SKU[:\s]*/i, '').trim() : ''),
+            price: base.price ?? priceMeta,
+            sizes,
+            image: base.image || getMetaContent(doc, ['meta[property="og:image"]', 'meta[name="twitter:image"]'])
+          };
+        };
+
+        const parseHypeDcProduct = (doc, jsonLdProduct) => {
+          const base = parseProductFromJsonLd(jsonLdProduct);
+          const priceMeta = parsePriceString(
+            getMetaContent(doc, [
+              'meta[property="product:price:amount"]',
+              'meta[name="product:price:amount"]',
+              'meta[property="og:price:amount"]',
+              'meta[itemprop="price"]'
+            ])
+          );
+          const skuCandidate =
+            doc.querySelector('[data-testid="pdp-sku"]')?.textContent ||
+            doc.querySelector('[data-product-sku]')?.getAttribute('data-product-sku') ||
+            '';
+          const sizesFromScripts = parseAdditionalJson(doc, (parsed) => {
+            if (!parsed || typeof parsed !== 'object') return null;
+            const sizeSet = gatherSizesFromObject(parsed);
+            if (sizeSet.size) {
+              return uniqueSizes(Array.from(sizeSet));
+            }
+            return null;
+          });
+          const sizes = uniqueSizes([
+            ...(base.sizes || []),
+            ...(sizesFromScripts || []),
+            ...collectSizesFromElements(doc, [
+              { selector: 'button[data-option-value]', attribute: 'data-option-value' },
+              { selector: 'label[data-option-value]', attribute: 'data-option-value' },
+              { selector: 'select[id*="Size"] option[value]', attribute: 'text' }
+            ])
+          ]);
+          return {
+            title: base.title || getMetaContent(doc, ['meta[property="og:title"]', 'title']),
+            sku: base.sku || (skuCandidate ? skuCandidate.replace(/SKU[:\s]*/i, '').trim() : ''),
+            price: base.price ?? priceMeta,
+            sizes,
+            image: base.image || getMetaContent(doc, ['meta[property="og:image"]', 'meta[name="twitter:image"]'])
+          };
+        };
+
+        const parseNikeProduct = (doc, jsonLdProduct) => {
+          const base = parseProductFromJsonLd(jsonLdProduct);
+          const nextDataScript = doc.getElementById('__NEXT_DATA__');
+          let sizesFromNext = [];
+          if (nextDataScript) {
+            try {
+              const parsed = JSON.parse(nextDataScript.textContent.trim());
+              if (parsed && typeof parsed === 'object') {
+                const sizeSet = gatherSizesFromObject(parsed);
+                sizesFromNext = uniqueSizes(Array.from(sizeSet));
+              }
+            } catch (error) {
+              // Ignore invalid NEXT data
+            }
+          }
+          const priceMeta = parsePriceString(
+            getMetaContent(doc, [
+              'meta[property="og:price:amount"]',
+              'meta[name="twitter:data1"]',
+              'meta[itemprop="price"]'
+            ])
+          );
+          const skuCandidate =
+            doc.querySelector('div[data-testid="product-details"] [data-testid="style-color"]')?.textContent ||
+            doc.querySelector('[data-testid="styleColor"]')?.textContent ||
+            '';
+          const sizes = uniqueSizes([
+            ...(base.sizes || []),
+            ...sizesFromNext,
+            ...collectSizesFromElements(doc, [
+              { selector: 'button[data-sku-id]', attribute: 'data-value' },
+              { selector: 'button[data-sku-id]', attribute: 'aria-label' },
+              { selector: 'input[name="skuAndSize"]', attribute: 'value' },
+              { selector: 'li[data-variant-size]', attribute: 'data-variant-size' }
+            ])
+          ]);
+          return {
+            title: base.title || getMetaContent(doc, ['meta[property="og:title"]', 'title']),
+            sku:
+              base.sku ||
+              (skuCandidate
+                ? skuCandidate
+                    .replace(/Style\s*/i, '')
+                    .replace(/Color\s*/i, '')
+                    .replace(/[:\s]+/g, '')
+                : ''),
+            price: base.price ?? priceMeta,
+            sizes,
+            image: base.image || getMetaContent(doc, ['meta[property="og:image"]', 'meta[name="twitter:image"]'])
+          };
+        };
+
+        const parseProduct = (html, url) => {
+          const nowIso = new Date().toISOString();
+          let parsedUrl;
+          try {
+            parsedUrl = new URL(url);
+          } catch (error) {
+            return canonicalizeProduct({
+              id: generateId(url),
+              site: '',
+              title: parseUrlToName(url),
+              sku: '',
+              price: null,
+              sizes: [],
+              image: '',
+              url,
+              lastUpdated: nowIso
+            });
+          }
+
+          const site = parsedUrl.hostname;
+          const baseProduct = {
+            id: generateId(parsedUrl.href),
+            site,
+            title: parseUrlToName(parsedUrl.href),
+            sku: '',
+            price: null,
+            sizes: [],
+            image: '',
+            url: parsedUrl.href,
+            lastUpdated: nowIso
+          };
+
+          try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const normalizedHost = site.replace(/^www\./, '');
+            const jsonLdProduct = getJsonLdProduct(doc);
+            let derived = null;
+
+            if (/footlocker\.com\.au$/i.test(normalizedHost)) {
+              derived = parseFootlockerProduct(doc, jsonLdProduct);
+            } else if (/jdsports\.com\.au$/i.test(normalizedHost)) {
+              derived = parseJdSportsProduct(doc, jsonLdProduct);
+            } else if (/hypedc\.com$/i.test(normalizedHost)) {
+              derived = parseHypeDcProduct(doc, jsonLdProduct);
+            } else if (/nike\.com$/i.test(normalizedHost)) {
+              derived = parseNikeProduct(doc, jsonLdProduct);
+            } else {
+              return canonicalizeProduct(baseProduct);
+            }
+
+            const merged = { ...baseProduct };
+            if (derived && typeof derived === 'object') {
+              if (derived.title) merged.title = derived.title;
+              if (derived.sku) merged.sku = derived.sku;
+              if (derived.price !== null && derived.price !== undefined) merged.price = parsePriceString(derived.price);
+              if (Array.isArray(derived.sizes) && derived.sizes.length) merged.sizes = uniqueSizes(derived.sizes);
+              if (derived.image) merged.image = derived.image;
+            }
+            merged.lastUpdated = new Date().toISOString();
+            return canonicalizeProduct(merged);
+          } catch (error) {
+            return canonicalizeProduct(baseProduct);
+          }
+        };
+
+        const fetchProduct = async (url) => {
+          try {
+            const response = await fetch(url, {
+              method: 'GET',
+              headers: {
+                Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+              },
+              credentials: 'omit',
+              mode: 'cors'
+            });
+            if (!response.ok) {
+              throw new Error(`Request failed with status ${response.status}`);
+            }
+            const html = await response.text();
+            return parseProduct(html, url);
+          } catch (error) {
+            throw new Error(error && error.message ? error.message : 'Unable to fetch product');
+          }
+        };
+
+        const simulateSizeAvailability = () => {
+          const baseSizes = ['US 6', 'US 7', 'US 8', 'US 9', 'US 10', 'US 11', 'US 12', 'US 13'];
+          const available = baseSizes.filter(() => Math.random() > 0.45);
+          return available.length ? available : ['US 9', 'US 10'];
+        };
+
+        const toIsoString = (date) => {
+          return date.toLocaleString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            month: 'short',
+            day: 'numeric'
+          });
+        };
+
+        const logEvent = (message, level = 'info') => {
+          const entry = document.createElement('li');
+          entry.className = 'rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 shadow-inner shadow-black/30';
+          const time = document.createElement('p');
+          time.className = 'text-xs uppercase tracking-wide text-slate-500';
+          time.textContent = new Date().toLocaleTimeString();
+          const content = document.createElement('p');
+          content.className = 'mt-1 text-sm';
+          const palette = {
+            info: 'text-slate-200',
+            success: 'text-emerald-200',
+            warning: 'text-amber-200',
+            error: 'text-rose-200'
+          };
+          content.classList.add(palette[level] || palette.info);
+          content.textContent = message;
+          entry.append(time, content);
+          elements.log.prepend(entry);
+          const limit = 30;
+          while (elements.log.childElementCount > limit) {
+            elements.log.removeChild(elements.log.lastElementChild);
+          }
+        };
+
+        const logChange = (diff, product) => {
+          if (!diff || !product) return;
+          const { priceChanged, oldPrice, newPrice, newSizes, removedSizes } = diff;
+          const hasPriceChange = Boolean(priceChanged);
+          const addedSizes = Array.isArray(newSizes) ? newSizes : [];
+          const droppedSizes = Array.isArray(removedSizes) ? removedSizes : [];
+          if (!hasPriceChange && !addedSizes.length && !droppedSizes.length) {
+            return;
+          }
+
+          const changes = [];
+          if (hasPriceChange) {
+            const oldLabel = formatCurrencyPlain(oldPrice) ?? 'unknown';
+            const newLabel = formatCurrencyPlain(newPrice) ?? 'unknown';
+            if (oldPrice === null && newPrice !== null) {
+              changes.push(`price set to ${newLabel}`);
+            } else if (oldPrice !== null && newPrice === null) {
+              changes.push(`price removed (was ${oldLabel})`);
+            } else {
+              changes.push(`price changed from ${oldLabel} to ${newLabel}`);
+            }
+          }
+          if (addedSizes.length) {
+            changes.push(`added sizes ${addedSizes.join(', ')}`);
+          }
+          if (droppedSizes.length) {
+            changes.push(`removed sizes ${droppedSizes.join(', ')}`);
+          }
+          if (!changes.length) {
+            return;
+          }
+
+          let level = 'info';
+          if (hasPriceChange && oldPrice !== null && newPrice !== null) {
+            if (newPrice < oldPrice) {
+              level = 'success';
+            } else if (newPrice > oldPrice) {
+              level = 'warning';
+            }
+          } else if (hasPriceChange && newPrice === null) {
+            level = 'warning';
+          } else if (!hasPriceChange) {
+            if (addedSizes.length && !droppedSizes.length) {
+              level = 'success';
+            } else if (droppedSizes.length && !addedSizes.length) {
+              level = 'warning';
+            }
+          }
+
+          logEvent(`${product.title}: ${changes.join('; ')}.`, level);
+        };
+
+        const persist = () => {
+          try {
+            saveProducts({
+              products: state.products,
+              monitors: state.monitors,
+              successChecks: state.successChecks,
+              alerts: state.alerts
+            });
+          } catch (error) {
+            logEvent('Unable to persist watchlist to local storage.', 'error');
+          }
+        };
+
+        const render = () => {
+          elements.tableBody.innerHTML = '';
+          elements.watchCount.textContent = `${state.monitors.length} sneaker${state.monitors.length === 1 ? '' : 's'} tracked`;
+          elements.successCount.textContent = state.successChecks;
+          elements.alertCount.textContent = state.alerts;
+          elements.emptyState.classList.toggle('hidden', state.monitors.length > 0);
+
+          const fragment = document.createDocumentFragment();
+          const productMap = new Map(state.products.map((product) => [product.id, product]));
+
+          state.monitors.forEach((monitor) => {
+            const product = productMap.get(monitor.productId);
+            if (!product) {
+              return;
+            }
+            const row = elements.rowTemplate.content.firstElementChild.cloneNode(true);
+            const nameEl = row.querySelector('[data-field="name"]');
+            const urlEl = row.querySelector('[data-field="url"]');
+            const targetEl = row.querySelector('[data-field="target"]');
+            const priceEl = row.querySelector('[data-field="last-price"]');
+            const statusEl = row.querySelector('[data-field="status"]');
+            const checkedEl = row.querySelector('[data-field="checked"]');
+
+            nameEl.textContent = product.title;
+            urlEl.textContent = product.url;
+            urlEl.href = product.url;
+            targetEl.innerHTML =
+              monitor.targetPrice !== null ? formatCurrency(monitor.targetPrice) : '<span class="text-slate-500">—</span>';
+            const priceSource = monitor.lastSeenPrice !== null && monitor.lastSeenPrice !== undefined ? monitor.lastSeenPrice : product.price;
+            priceEl.innerHTML =
+              priceSource !== null && priceSource !== undefined
+                ? formatCurrency(priceSource)
+                : '<span class="text-slate-500">—</span>';
+            checkedEl.textContent = monitor.lastChecked ? toIsoString(new Date(monitor.lastChecked)) : '—';
+
+            const level = monitor.statusLevel || 'neutral';
+            statusEl.textContent = monitor.status || 'Idle';
+            statusEl.className = `inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+              level === 'alert'
+                ? 'bg-rose-500/20 text-rose-200'
+                : level === 'success'
+                ? 'bg-emerald-500/20 text-emerald-200'
+                : level === 'warning'
+                ? 'bg-amber-400/20 text-amber-100'
+                : 'bg-slate-800 text-slate-200'
+            }`;
+
+            row.querySelector('[data-action="check"]').addEventListener('click', () => {
+              runCheck(product.id, true).catch((error) => {
+                const reason = error && error.message ? error.message : 'Manual check failed';
+                logEvent(`${product.title}: ${reason}.`, 'error');
+              });
+            });
+
+            row.querySelector('[data-action="remove"]').addEventListener('click', () => {
+              removeSneaker(product.id);
+            });
+
+            row.querySelector('[data-action="rename"]').addEventListener('click', () => {
+              renameSneaker(product.id);
+            });
+
+            if (monitor.targetPrice !== null && priceSource !== null && priceSource !== undefined && Number(priceSource) <= Number(monitor.targetPrice)) {
+              row.classList.add('bg-emerald-500/10');
+            }
+
+            fragment.appendChild(row);
+          });
+
+          elements.tableBody.appendChild(fragment);
+        };
+
+        const parsePriceValue = (value) => {
+          if (value === null || value === undefined || value === '') {
+            return null;
+          }
+          const numeric = Number(value);
+          if (Number.isNaN(numeric) || numeric < 0) {
+            return null;
+          }
+          return Number(numeric.toFixed(2));
+        };
+
+        const detectChanges = (oldProduct, newProduct) => {
+          const safeOld = oldProduct && typeof oldProduct === 'object' ? oldProduct : {};
+          const safeNew = newProduct && typeof newProduct === 'object' ? newProduct : {};
+
+          const normalizePrice = (price) => {
+            const numeric = Number(price);
+            return Number.isFinite(numeric) ? Number(numeric.toFixed(2)) : null;
+          };
+
+          const normalizeSizes = (sizes) => (Array.isArray(sizes) ? uniqueSizes(sizes) : []);
+
+          const oldPrice = normalizePrice(safeOld.price);
+          const newPrice = normalizePrice(safeNew.price);
+          const oldSizes = normalizeSizes(safeOld.sizes);
+          const freshSizes = normalizeSizes(safeNew.sizes);
+
+          const priceChanged =
+            (oldPrice === null && newPrice !== null) ||
+            (oldPrice !== null && newPrice === null) ||
+            (oldPrice !== null && newPrice !== null && oldPrice !== newPrice);
+
+          return {
+            priceChanged,
+            oldPrice,
+            newPrice,
+            newSizes: freshSizes.filter((size) => !oldSizes.includes(size)),
+            removedSizes: oldSizes.filter((size) => !freshSizes.includes(size))
+          };
+        };
+
+        const createProductFromUrl = (parsedUrl) => {
+          const slugSegments = parsedUrl.pathname.split('/').filter(Boolean);
+          const slug = slugSegments[slugSegments.length - 1] || parsedUrl.hostname;
+          const derivedSku = parsedUrl.searchParams.get('sku') || slug.replace(/[^a-z0-9]/gi, '').toUpperCase();
+          const nowIso = new Date().toISOString();
+
+          return canonicalizeProduct({
+            id: generateId(parsedUrl.href),
+            site: parsedUrl.hostname,
+            title: parseUrlToName(parsedUrl.href),
+            sku: derivedSku.slice(0, 32),
+            price: null,
+            sizes: [],
+            image: '',
+            url: parsedUrl.href,
+            lastUpdated: nowIso
+          });
+        };
+
+        const addSneaker = (url, targetPrice) => {
+          const normalizedUrl = url.trim();
+          if (!normalizedUrl) {
+            logEvent('Enter a valid sneaker URL before adding.', 'warning');
+            return;
+          }
+          let parsedUrl;
+          try {
+            parsedUrl = new URL(normalizedUrl);
+          } catch (error) {
+            logEvent('Invalid URL. Please double-check and try again.', 'error');
+            return;
+          }
+
+          const productId = generateId(parsedUrl.href);
+          const existingMonitor = state.monitors.find((monitor) => monitor.productId === productId);
+          if (existingMonitor) {
+            logEvent('This sneaker is already being tracked.', 'warning');
+            return;
+          }
+
+          let product = state.products.find((item) => item.id === productId);
+          if (!product) {
+            product = createProductFromUrl(parsedUrl);
+            state.products.push(product);
+          }
+
+          const monitor = canonicalizeMonitor({
+            productId,
+            targetPrice: parsePriceValue(targetPrice),
+            lastSeenPrice: product.price,
+            lastChecked: null,
+            status: 'Idle',
+            statusLevel: 'neutral'
+          });
+
+          state.monitors.push(monitor);
+          persist();
+          render();
+          logEvent(`Now monitoring ${product.title}.`, 'success');
+        };
+
+        const removeSneaker = (productId) => {
+          const monitorIndex = state.monitors.findIndex((item) => item.productId === productId);
+          if (monitorIndex === -1) return;
+          const [removedMonitor] = state.monitors.splice(monitorIndex, 1);
+          const product = state.products.find((item) => item.id === productId);
+          if (!state.monitors.some((item) => item.productId === productId)) {
+            state.products = state.products.filter((item) => item.id !== productId);
+          }
+          persist();
+          render();
+          if (product) {
+            logEvent(`Stopped monitoring ${product.title}.`, 'warning');
+          } else if (removedMonitor) {
+            logEvent('Removed an orphaned product monitor.', 'warning');
+          }
+        };
+
+        const renameSneaker = (productId) => {
+          const product = state.products.find((item) => item.id === productId);
+          if (!product) return;
+          const newName = prompt('Rename sneaker', product.title);
+          if (!newName) {
+            return;
+          }
+          const trimmed = newName.trim();
+          if (!trimmed) {
+            return;
+          }
+          product.title = trimmed;
+          product.lastUpdated = new Date().toISOString();
+          persist();
+          render();
+          logEvent(`Renamed tracker to ${product.title}.`, 'info');
+        };
+
+        const randomPrice = (base = 200) => {
+          const safeBase = Number.isFinite(base) && base > 0 ? base : 200;
+          const variance = Math.random() * 120 - 60;
+          const raw = Math.max(60, safeBase + variance);
+          return Number(raw.toFixed(2));
+        };
+
+        const randomStatus = () => {
+          const roll = Math.random();
+          if (roll > 0.82) return { status: 'Restock spotted', level: 'alert' };
+          if (roll > 0.6) return { status: 'Low inventory', level: 'warning' };
+          if (roll > 0.35) return { status: 'In stock', level: 'success' };
+          return { status: 'No change', level: 'neutral' };
+        };
+
+        const runCheck = async (productId, manual = false) => {
+          const monitor = state.monitors.find((item) => item.productId === productId);
+          const product = state.products.find((item) => item.id === productId);
+          if (!monitor || !product) return;
+
+          const baselineProduct = {
+            ...product,
+            price: Number.isFinite(product.price) ? Number(product.price) : null,
+            sizes: Array.isArray(product.sizes) ? [...product.sizes] : []
+          };
+          const previousPrice = monitor.lastSeenPrice ?? baselineProduct.price ?? null;
+          const firstCheck = !monitor.lastChecked;
+          let successRecorded = false;
+          let diffResult = null;
+
+          monitor.status = 'Checking…';
+          monitor.statusLevel = 'neutral';
+          render();
+
+          try {
+            const liveProduct = await fetchProduct(product.url);
+            const completedAt = new Date();
+
+            if (liveProduct && typeof liveProduct === 'object') {
+              if (liveProduct.title) product.title = liveProduct.title;
+              if (liveProduct.sku) product.sku = liveProduct.sku;
+              if (liveProduct.image) product.image = liveProduct.image;
+              if (liveProduct.site) product.site = liveProduct.site;
+
+              if (Array.isArray(liveProduct.sizes) && liveProduct.sizes.length) {
+                product.sizes = uniqueSizes(liveProduct.sizes);
+              }
+
+              if (liveProduct.price !== null && liveProduct.price !== undefined) {
+                product.price = liveProduct.price;
+                monitor.lastSeenPrice = liveProduct.price;
+              }
+            }
+
+            product.lastUpdated = completedAt.toISOString();
+            monitor.lastChecked = completedAt.toISOString();
+
+            diffResult = detectChanges(baselineProduct, {
+              ...product,
+              sizes: Array.isArray(product.sizes) ? [...product.sizes] : []
+            });
+
+            let statusLevel = 'neutral';
+            let statusMessage = 'No change';
+            let logLevel = 'info';
+            let logMessage = `${product.title}: check complete.`;
+
+            if (monitor.lastSeenPrice !== null && monitor.lastSeenPrice !== undefined) {
+              const formatted = formatCurrency(monitor.lastSeenPrice).replace(/<[^>]*>/g, '');
+              if (monitor.targetPrice !== null && monitor.lastSeenPrice <= monitor.targetPrice) {
+                statusLevel = 'alert';
+                statusMessage = `Price drop to ${formatted}`;
+                logLevel = 'success';
+                logMessage = `${product.title}: hit target price at ${formatted}!`;
+                state.alerts += 1;
+                state.successChecks += 1;
+                successRecorded = true;
+              } else if (previousPrice !== null && monitor.lastSeenPrice < previousPrice) {
+                statusLevel = 'success';
+                statusMessage = `Price decreased to ${formatted}`;
+                logLevel = 'success';
+                logMessage = `${product.title}: price decreased to ${formatted}.`;
+                state.successChecks += 1;
+                successRecorded = true;
+              } else if (previousPrice !== null && monitor.lastSeenPrice > previousPrice) {
+                statusLevel = 'warning';
+                statusMessage = `Price increased to ${formatted}`;
+                logLevel = 'warning';
+                logMessage = `${product.title}: price increased to ${formatted}.`;
+              } else {
+                statusMessage = `Last seen ${formatted}`;
+                logMessage = `${product.title}: last seen at ${formatted}.`;
+              }
+            } else {
+              statusLevel = 'warning';
+              statusMessage = 'No price data';
+              logLevel = 'warning';
+              logMessage = `${product.title}: live check returned without price information.`;
+            }
+
+            monitor.status = statusMessage;
+            monitor.statusLevel = statusLevel;
+            logEvent(logMessage, logLevel);
+          } catch (error) {
+            const fallbackStatus = randomStatus();
+            const fallbackPrice = randomPrice(monitor.targetPrice ?? product.price ?? 200);
+            const completedAt = new Date();
+
+            product.price = fallbackPrice;
+            product.sizes = simulateSizeAvailability();
+            product.lastUpdated = completedAt.toISOString();
+
+            monitor.lastSeenPrice = fallbackPrice;
+            monitor.lastChecked = completedAt.toISOString();
+            monitor.status = fallbackStatus.status;
+            monitor.statusLevel = fallbackStatus.level;
+
+            diffResult = detectChanges(baselineProduct, {
+              ...product,
+              sizes: Array.isArray(product.sizes) ? [...product.sizes] : []
+            });
+
+            if ((fallbackStatus.level === 'success' || fallbackStatus.level === 'alert') && !successRecorded) {
+              state.successChecks += 1;
+              successRecorded = true;
+            }
+
+            if (monitor.targetPrice !== null && fallbackPrice <= monitor.targetPrice) {
+              const formatted = formatCurrency(fallbackPrice).replace(/<[^>]*>/g, '');
+              monitor.status = `Price drop: ${formatted}`;
+              monitor.statusLevel = 'alert';
+              state.alerts += 1;
+              if (!successRecorded) {
+                state.successChecks += 1;
+                successRecorded = true;
+              }
+              logEvent(`${product.title}: simulated hit at ${formatted}.`, 'success');
+            } else {
+              const reason = error && error.message ? error.message : 'unknown error';
+              logEvent(`${product.title}: live fetch failed (${reason}). Using simulated data.`, 'warning');
+            }
+          } finally {
+            if (!firstCheck && diffResult) {
+              logChange(diffResult, product);
+            }
+            persist();
+            render();
+            const lastChecked = monitor.lastChecked ? new Date(monitor.lastChecked) : new Date();
+            elements.heartbeat.textContent = toIsoString(lastChecked);
+            if (manual) {
+              elements.heartbeat.classList.add('text-emerald-300');
+              setTimeout(() => elements.heartbeat.classList.remove('text-emerald-300'), 1200);
+            }
+          }
+        };
+
+        const runAllChecks = async () => {
+          if (!state.monitors.length || state.isRefreshing) return;
+          state.isRefreshing = true;
+          try {
+            const ids = state.monitors.map((monitor) => monitor.productId);
+            await Promise.all(ids.map((id) => runCheck(id, false)));
+          } finally {
+            state.isRefreshing = false;
+          }
+        };
+
+        const startAutoRefresh = () => {
+          if (state.timer) clearInterval(state.timer);
+          state.timer = setInterval(() => {
+            runAllChecks().catch((error) => {
+              state.isRefreshing = false;
+              const reason = error && error.message ? error.message : 'auto refresh error';
+              logEvent(`Auto refresh issue: ${reason}.`, 'warning');
+            });
+          }, cadenceMs);
+          elements.cadence.textContent = `${Math.round(cadenceMs / 1000)}s`;
+        };
+
+        const bootstrapState = () => {
+          const snapshot = loadProducts();
+          state.products = snapshot.products;
+          state.successChecks = snapshot.successChecks;
+          state.alerts = snapshot.alerts;
+          const validIds = new Set(state.products.map((product) => product.id));
+          const sanitizedMonitors = snapshot.monitors.filter((monitor) => validIds.has(monitor.productId));
+          state.monitors = sanitizedMonitors;
+          if (sanitizedMonitors.length !== snapshot.monitors.length) {
+            persist();
+          }
+        };
+
+        elements.form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          const urlValue = elements.url.value;
+          const priceValue = elements.price.value;
+          addSneaker(urlValue, priceValue);
+          elements.form.reset();
+          elements.url.focus();
+        });
+
+        elements.purgeButton.addEventListener('click', () => {
+          if (!confirm('This will remove all tracked sneakers and clear stored activity. Continue?')) {
+            return;
+          }
+          state.products = [];
+          state.monitors = [];
+          state.alerts = 0;
+          state.successChecks = 0;
+          try {
+            localStorage.removeItem(storageKey);
+          } catch (error) {
+            // ignore removal issues
+          }
+          persist();
+          render();
+          elements.log.innerHTML = '';
+          logEvent('Storage cleared and monitor reset.', 'warning');
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            runAllChecks().catch(() => {});
+          }
+        });
+
+        bootstrapState();
+        render();
+        startAutoRefresh();
+
+        if (hydrationWarningMessage) {
+          logEvent(hydrationWarningMessage, 'warning');
+        }
+
+        if (!state.monitors.length) {
+          logEvent('Welcome! Add a sneaker URL to begin monitoring.', 'info');
+        } else {
+          logEvent('Monitor restored from previous session.', 'info');
+          runAllChecks().catch(() => {});
+        }
+      })();
+    </script>
+
+  </body>
+</html>
